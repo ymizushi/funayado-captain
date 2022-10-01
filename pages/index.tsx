@@ -3,6 +3,7 @@ import Head from 'next/head'
 import styles from '../styles/Home.module.css'
 import { io, Socket } from "socket.io-client";
 import { useEffect, useState } from 'react';
+import { KV, Select } from '../components/Input';
 let socket: Socket
 
 const Home: NextPage = () => {
@@ -26,6 +27,13 @@ const Home: NextPage = () => {
 
   const [input, setInput] = useState<string>("")
 
+  const values: KV[] = [
+    {
+      key: 1,
+      value: 1
+    }
+  ]
+
   useEffect(() => {
       socketInitializer()
   }
@@ -37,6 +45,11 @@ const Home: NextPage = () => {
       </Head>
 
       <main className={styles.main}>
+        <Select
+         id="selectRoom"
+         name="selectRoom"
+         values={values}
+        />
         <input
           placeholder="Type something"
           value={input}
