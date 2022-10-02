@@ -1,17 +1,18 @@
 import Channels from "pusher";
-import { config } from "../../config";
+import { privateConfig, publicConfig } from "@config";
 
 const SocketHandler = (req: any, res: any) => {
   const channels = new Channels({
-    appId:  config.pusher.appId,
-    key: config.pusher.key,
-    secret: config.pusher.secret,
-    cluster: config.pusher.cluster,
+    appId:  privateConfig().pusher.appId,
+    key: publicConfig().pusher.key,
+    secret: privateConfig().pusher.secret,
+    cluster: publicConfig().pusher.cluster,
     useTLS: true
   });
 
   const data = req.body;
-  channels && channels.trigger("my-channel", "my-event", data);
+  console.log(`pushed data: ${JSON.stringify(data)}`)
+  channels && channels.trigger(data.roomId, "roomStatus", data);
   res.end()
 }
 
