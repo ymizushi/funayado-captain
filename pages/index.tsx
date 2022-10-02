@@ -1,67 +1,44 @@
-import type { NextPage } from 'next'
-import Head from 'next/head'
-import styles from '../styles/Home.module.css'
-import { io, Socket } from "socket.io-client";
-import { useEffect, useState } from 'react';
-import { KV, Select } from '../components/Input';
-let socket: Socket
+import { useEffect } from 'react';
+import Pusher from "pusher-js";
+// TODO: 絶対importで書く
+import { config } from '../config';
 
-const Home: NextPage = () => {
-  const socketInitializer = async () => {
-    await fetch('/api/socket');
-    socket = io()
-
-    socket.on('connect', () => {
-      console.log('connected')
-    })
-
-    socket.on('update-input', msg => {
-      setInput(msg)
-    })
-  }
-
-  const onChangeHandler = (e: any) => {
-    setInput(e.target.value)
-    socket.emit('input-change', e.target.value)
-  }
-
-  const [input, setInput] = useState<string>("")
-
-  const values: KV[] = [
-    {
-      key: 1,
-      value: 1
-    }
-  ]
-
+const TryPusher = () => {
   useEffect(() => {
-      socketInitializer()
+    setPusherListener();
+  }, []);
+
+  const setPusherListener = () => {
+    let channels = new Pusher(config.pusher.key , {
+      cluster: config.pusher.cluster,
+    });
+
+    let channel = channels.subscribe("my-channel");
+
+    channel.bind("my-event", (data: any) => {
+      console.log("data from server", data)
+    });
+  };
+
+  const pushData = async (data: any) => {
+    const res = await fetch("/api/socket", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    });
+
+    if (!res.ok) {
+      console.error("failed to push data");
+    }
   }
-    , [])
 
   return (
-    <div className={styles.container}>
-      <Head>
-      </Head>
-
-      <main className={styles.main}>
-        <Select
-         id="selectRoom"
-         name="selectRoom"
-         values={values}
-        />
-        <input
-          placeholder="Type something"
-          value={input}
-          onChange={onChangeHandler}
-        />
-
-      </main>
-
-      <footer className={styles.footer}>
-      </footer>
-    </div>
-  )
+    <button onClick={async () => await pushData({foo: "bar"})}>
+      Get Data
+    </button>
+  );
 }
 
-export default Home
+export default TryPusher

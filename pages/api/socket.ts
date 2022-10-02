@@ -1,20 +1,17 @@
-import { Server } from 'Socket.IO'
+import Channels from "pusher";
+import { config } from "../../config";
 
 const SocketHandler = (req: any, res: any) => {
-  if (res.socket?.server?.io) {
-    console.log('Socket is already running')
-  } else {
-    console.log('Socket is initializing')
-    const io = new Server(res.socket.server)
-    res.socket.server.io = io
+  const channels = new Channels({
+    appId:  config.pusher.appId,
+    key: config.pusher.key,
+    secret: config.pusher.secret,
+    cluster: config.pusher.cluster,
+    useTLS: true
+  });
 
-    io.on('connection', socket => {
-      socket.on('input-change', msg => {
-        socket.broadcast.emit('update-input', msg)
-      })
-    })
-
-  }
+  const data = req.body;
+  channels && channels.trigger("my-channel", "my-event", data);
   res.end()
 }
 
