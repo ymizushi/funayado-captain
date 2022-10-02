@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import Pusher from "pusher-js";
 import { publicConfig } from '@config';
 import { VStack } from '@components/layout/VStack';
@@ -6,39 +6,42 @@ import { Component } from '@components/basic/Component';
 import { Button } from '@components/input/Button';
 import { Text } from '@components/text/Text';
 import { Input } from '@components/input/Input';
-import { VerticalSlider } from '@components/input/Slider';
+import { VerticalRangeSlider } from '@components/input/Slider';
 import { RoomStatus, useRoomStatus } from '@hooks/useRoomStatus';
+import { speak } from '@util/textToSpeech';
 const config = publicConfig()
 let channels = new Pusher(config.pusher.key , {
   cluster: config.pusher.cluster,
 });
 
 
-
 const Home = () => {
-  const [roomStatus, setRoomStatus] = useRoomStatus()
+  const [roomId, setRoomId] = useState<string>("default-room")
+  const [roomStatus, setRoomStatus] = useRoomStatus(roomId)
 
   useEffect(() => {
-    setPusherListener();
-  }, [roomStatus?.roomId]);
-
-  const setPusherListener = () => {
-    if (roomStatus) {
-      let channel = channels.subscribe(roomStatus.roomId);
+    if (roomId) {
+      let channel = channels.subscribe(roomId);
       channel.bind("roomStatus", (data: RoomStatus) => {
         console.log("data from server", data)
-        setRoomStatus(data)
+        speak(data.waterDepth.toString()+"メートル\n")
       });
+      return () => {
+        channel.unbind_all()
+      }
     } 
-  };
+  }, [roomId]);
 
-  const pushRoomStatus = async (data: RoomStatus|null) => {
+  const pushRoomStatus = async (roomId: string, data: RoomStatus|null) => {
     const res = await fetch("/api/socket", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(data),
+      body: JSON.stringify({
+        roomId: roomId,
+        status: data
+      }),
     });
 
     if (!res.ok) {
@@ -50,15 +53,11 @@ const Home = () => {
     <VStack>
       <Component>
         <Text>部屋選択</Text>
-        <Input id='inputRoomId' value={roomStatus?.roomId ?? ""} onChange={(e) => roomStatus && setRoomStatus(
-          {
-            ...roomStatus,
-            roomId: e.target.value
-          }
-        )} />
+        <Input id='inputRoomId' value={roomId ?? ""} onChange={(e) => roomId && setRoomId(roomId)} />
         <Button onClick={async () => {
           if (roomStatus) {
             await pushRoomStatus(
+              roomId,
               roomStatus
             )
           }
@@ -68,7 +67,7 @@ const Home = () => {
       </Component>
       <Component>
         <Text>水深</Text>
-        <VerticalSlider
+        <VerticalRangeSlider
           value={roomStatus?.waterDepth ?? 0}
           onChange={(n: number) => {
             if (roomStatus) {
@@ -77,11 +76,11 @@ const Home = () => {
                   waterDepth: n
                 }
               setRoomStatus(newStatus)
-              pushRoomStatus(newStatus)
             }
-          }
-         }
-          id={'inputWaterDepth'} max={200} min={0}/>
+          }}
+          max={200}
+          min={0}
+         />
       </Component>
     </VStack>
   );

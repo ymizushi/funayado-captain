@@ -1,20 +1,24 @@
 import React, { ChangeEventHandler } from "react";
 
-type InputType = "text"
+import Slider from 'rc-slider';
+import 'rc-slider/assets/index.css';
 
-type Props = {
-  value: number,
-  onChange: (n: number) => void
-  id: string,
-  max: number
+export type Props = {
+  value: number
   min: number
+  max: number
+  onChange: (n: number) => void
 }
 
-export function VerticalSlider(props: Props) {
-  return <input
+export function VerticalRangeSlider(props: Props) {
+  return <Slider 
     value={props.value}
-    onChange={(e) => props.onChange(parseInt(e.target.value))}
-    type={'text'}
-    id={props.id}
+    min={props.min}
+    max={props.max}
+    onChange={(n: number|number[]) => {
+      if (typeof n == 'number') {
+        props.onChange(n)
+      }
+    }}
   />
 }

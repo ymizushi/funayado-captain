@@ -16,11 +16,13 @@
     "next": "12.3.1",
     "pusher": "^5.1.1-beta",
     "pusher-js": "^7.4.0",
+    "rc-slider": "^10.0.1",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "socket.io": "^4.5.2",
     "socket.io-client": "^4.5.2",
-    "tls": "^0.0.1"
+    "tls": "^0.0.1",
+    "toolcool-range-slider": "^4.0.15"
   },
   "devDependencies": {
     "@types/node": "18.7.23",

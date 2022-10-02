@@ -12,7 +12,7 @@ const SocketHandler = (req: any, res: any) => {
 
   const data = req.body;
   console.log(`pushed data: ${JSON.stringify(data)}`)
-  channels && channels.trigger(data.roomId, "roomStatus", data);
+  channels && channels.trigger(data.roomId, "roomStatus", data.status);
   res.end()
 }
 
