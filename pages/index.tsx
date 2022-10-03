@@ -23,7 +23,14 @@ const Home = () => {
   useEffect(() => {
     window.speechSynthesis.onvoiceschanged = () => {
       setVoices(window.speechSynthesis.getVoices())
+      if (window.speechSynthesis.getVoices().length > 0) {
+        setVoice(window.speechSynthesis.getVoices()[0])
+      }
     };
+    setVoices(window.speechSynthesis.getVoices())
+    if (window.speechSynthesis.getVoices().length > 0) {
+      setVoice(window.speechSynthesis.getVoices()[0])
+    }
     if (roomId) {
       const channels = new Pusher(config.pusher.key , {
         cluster: config.pusher.cluster,
