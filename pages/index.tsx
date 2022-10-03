@@ -11,10 +11,6 @@ import { RoomStatus, useRoomStatus } from '@hooks/useRoomStatus';
 import { speak } from '@util/textToSpeech';
 import { KV, Select } from '@components/input/Select';
 const config = publicConfig
-const channels = new Pusher(config.pusher.key , {
-  cluster: config.pusher.cluster,
-});
-
 const EventType = 'roomStatus'
 
 const Home = () => {
@@ -29,6 +25,9 @@ const Home = () => {
       setVoices(window.speechSynthesis.getVoices().filter(voice => voice.lang.includes('ja-JP')))
     };
     if (roomId) {
+      const channels = new Pusher(config.pusher.key , {
+        cluster: config.pusher.cluster,
+      });
       let channel = channels.subscribe(roomId);
       channel.bind("roomStatus", (data: RoomStatus) => {
         console.log("data from server", data)
@@ -36,6 +35,7 @@ const Home = () => {
       });
       return () => {
         channel.unbind('roomStatus')
+        channels.unsubscribe(roomId);
       }
     } 
   }, [roomId]);
