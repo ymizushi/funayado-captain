@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useState } from 'react';
 import Pusher from "pusher-js";
 import { publicConfig } from '@config';
 import { VStack } from '@components/layout/VStack';
@@ -9,6 +9,7 @@ import { Input } from '@components/input/Input';
 import { VerticalRangeSlider } from '@components/input/Slider';
 import { RoomStatus, useRoomStatus } from '@hooks/useRoomStatus';
 import { speak } from '@util/textToSpeech';
+import { useJapaneseVoice } from '@hooks/useJapaneseVoice';
 const config = publicConfig()
 const channels = new Pusher(config.pusher.key , {
   cluster: config.pusher.cluster,
@@ -16,16 +17,28 @@ const channels = new Pusher(config.pusher.key , {
 
 const EventType = 'roomStatus'
 
+function subscribeRoom() {
+
+}
+
 const Home = () => {
   const [roomId, setRoomId] = useState<string>("default-room")
   const [roomStatus, setRoomStatus] = useRoomStatus(roomId)
+  const [voices, _] = useJapaneseVoice()
+  const [lastStatus, setLastStatus] = useState<RoomStatus|null>(null)
+
+  useEffect(() => {
+    if (lastStatus) {
+      speak(lastStatus.waterDepth.toString()+"メートル\n", voices[0])
+    }
+  }, [lastStatus]);
 
   useEffect(() => {
     if (roomId) {
       let channel = channels.subscribe(roomId);
       channel.bind("roomStatus", (data: RoomStatus) => {
         console.log("data from server", data)
-        speak(data.waterDepth.toString()+"メートル\n")
+        setLastStatus(data)
       });
       return () => {
         channel.unbind('roomStatus')
