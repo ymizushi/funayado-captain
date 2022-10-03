@@ -22,7 +22,7 @@ const Home = () => {
 
   useEffect(() => {
     window.speechSynthesis.onvoiceschanged = () => {
-      setVoices(window.speechSynthesis.getVoices().filter(voice => voice.lang.includes('ja-JP')))
+      setVoices(window.speechSynthesis.getVoices())
     };
     if (roomId) {
       const channels = new Pusher(config.pusher.key , {
