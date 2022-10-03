@@ -12,20 +12,16 @@ type PrivateConfig = {
   }
 }
 
-export const publicConfig = (): PublicConfig => {
-  return {
-    pusher: {
-      key: process.env.NEXT_PUBLIC_PUSHER_KEY ?? "",
-      cluster: process.env.NEXT_PUBLIC_PUSHER_CLUSTER ?? "",
-    }
+export const publicConfig: PublicConfig = {
+  pusher: {
+    key: process.env.NEXT_PUBLIC_PUSHER_KEY ?? "",
+    cluster: process.env.NEXT_PUBLIC_PUSHER_CLUSTER ?? "",
   }
 }
 
-export const privateConfig = (): PrivateConfig => {
-  return {
-    pusher: {
-      appId: process.env.PUSHER_APP_ID ?? "",
-      secret: process.env.PUSHER_SECRET ?? "",
-    }
+export const privateConfig : PrivateConfig = {
+  pusher: {
+    appId: process.env.PUSHER_APP_ID ?? "",
+    secret: process.env.PUSHER_SECRET ?? "",
   }
 }

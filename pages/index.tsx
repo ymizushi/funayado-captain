@@ -10,7 +10,7 @@ import { VerticalRangeSlider } from '@components/input/Slider';
 import { RoomStatus, useRoomStatus } from '@hooks/useRoomStatus';
 import { speak } from '@util/textToSpeech';
 import { KV, Select } from '@components/input/Select';
-const config = publicConfig()
+const config = publicConfig
 const channels = new Pusher(config.pusher.key , {
   cluster: config.pusher.cluster,
 });
