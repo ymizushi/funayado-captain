@@ -12,9 +12,9 @@ const channels = new Channels({
 
 const SocketHandler = (req: NextApiRequest, res: NextApiResponse) => {
   const data = req.body;
-  console.log(`pushed data: ${JSON.stringify(data)}`)
   channels && channels.trigger(data.roomId, "roomStatus", data.status);
   res.status(200).json({status: "ok"})
+  console.log(`pushed data: ${JSON.stringify(data)}`)
 }
 
 export default SocketHandler
