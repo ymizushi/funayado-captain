@@ -20,14 +20,14 @@ export function useLocalStorage<T>(
         setStorage(null)
       }
     }
-  }, [setStorage])
+  }, [setStorage, key])
 
   const setLocalStorage = useCallback(
     (value: SetStateAction<T | null>) => {
       localStorage.setItem(key, JSON.stringify(value))
       setStorage(value)
     },
-    [setStorage]
+    [setStorage, key]
   )
 
   return [storage, setLocalStorage]

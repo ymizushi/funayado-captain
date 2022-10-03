@@ -10,10 +10,11 @@ import { VerticalRangeSlider } from '@components/input/Slider';
 import { RoomStatus, useRoomStatus } from '@hooks/useRoomStatus';
 import { speak } from '@util/textToSpeech';
 const config = publicConfig()
-let channels = new Pusher(config.pusher.key , {
+const channels = new Pusher(config.pusher.key , {
   cluster: config.pusher.cluster,
 });
 
+const EventType = 'roomStatus'
 
 const Home = () => {
   const [roomId, setRoomId] = useState<string>("default-room")
@@ -27,7 +28,7 @@ const Home = () => {
         speak(data.waterDepth.toString()+"メートル\n")
       });
       return () => {
-        channel.unbind_all()
+        channel.unbind('roomStatus')
       }
     } 
   }, [roomId]);
