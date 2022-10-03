@@ -9,7 +9,7 @@ import { Input } from '@components/input/Input';
 import { VerticalRangeSlider } from '@components/input/Slider';
 import { RoomStatus, useRoomStatus } from '@hooks/useRoomStatus';
 import { speak } from '@util/textToSpeech';
-import { useJapaneseVoice } from '@hooks/useJapaneseVoice';
+import { KV, Select } from '@components/input/Select';
 const config = publicConfig()
 const channels = new Pusher(config.pusher.key , {
   cluster: config.pusher.cluster,
@@ -17,23 +17,17 @@ const channels = new Pusher(config.pusher.key , {
 
 const EventType = 'roomStatus'
 
-function subscribeRoom() {
-
-}
-
 const Home = () => {
   const [roomId, setRoomId] = useState<string>("default-room")
   const [roomStatus, setRoomStatus] = useRoomStatus(roomId)
-  const [voices, _] = useJapaneseVoice()
+  const [voices, setVoices] = useState<SpeechSynthesisVoice[]>([])
+  const [voice, setVoice] = useState<SpeechSynthesisVoice|null>()
   const [lastStatus, setLastStatus] = useState<RoomStatus|null>(null)
 
   useEffect(() => {
-    if (lastStatus) {
-      speak(lastStatus.waterDepth.toString()+"メートル\n", voices[0])
-    }
-  }, [lastStatus]);
-
-  useEffect(() => {
+    window.speechSynthesis.onvoiceschanged = () => {
+      setVoices(window.speechSynthesis.getVoices().filter(voice => voice.lang.includes('ja-JP')))
+    };
     if (roomId) {
       let channel = channels.subscribe(roomId);
       channel.bind("roomStatus", (data: RoomStatus) => {
@@ -45,6 +39,13 @@ const Home = () => {
       }
     } 
   }, [roomId]);
+
+  useEffect(() => {
+    if (lastStatus && voice) {
+      speak(lastStatus.waterDepth.toString()+"メートル\n", voice)
+    }
+  }, [lastStatus, voice])
+
 
   const pushRoomStatus = async (roomId: string, data: RoomStatus|null) => {
     const res = await fetch("/api/socket", {
@@ -78,6 +79,22 @@ const Home = () => {
         }}>
           選択
         </Button>
+      </Component>
+      <Component>
+        <Text>読み上げ言語選択</Text>
+        <Select 
+          name={'selectVoice'}
+          id={'selectVoice'} 
+          values={voices.map(v => ({
+            key: v.name,
+            name: v.name,
+            value: v
+          }))}         
+          onChange={(kvVoice: KV<SpeechSynthesisVoice>) => {
+            return setVoice(kvVoice.value)
+          }
+          }
+          />
       </Component>
       <Component>
         <Text>水深</Text>
