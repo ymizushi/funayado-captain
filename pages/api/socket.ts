@@ -10,11 +10,13 @@ const channels = new Channels({
   useTLS: true
 });
 
-const SocketHandler = (req: NextApiRequest, res: NextApiResponse) => {
-  const data = req.body;
-  channels && channels.trigger(data.roomId, "roomStatus", data.status);
-  res.status(200).json({status: "ok"})
-  console.log(`pushed data: ${JSON.stringify(data)}`)
+const SocketHandler = async (req: NextApiRequest, res: NextApiResponse) => {
+  if (channels) {
+    const data = req.body;
+    await channels.trigger(data.roomId, "roomStatus", data.status);
+    res.status(200).json({status: "ok"})
+    console.log(`pushed data: ${JSON.stringify(data)}`)
+  } 
 }
 
 export default SocketHandler
