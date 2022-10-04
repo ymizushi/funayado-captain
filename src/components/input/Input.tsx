@@ -3,8 +3,8 @@ import React, { ChangeEventHandler } from "react";
 type InputType = "text"
 
 type Props = {
-  value: string,
-  onChange: ChangeEventHandler<HTMLInputElement>
+  value: string|number,
+  onChange: <T extends string>(value: T) => void,
   id: string,
   placeholder?: string
   type?: InputType,
@@ -13,13 +13,15 @@ type Props = {
   minLength?: number
   maxLength?: number
   size?: number
+  disabled?: boolean
 }
 
 export function Input(props: Props) {
   return <input
+    disabled={props.disabled}
     placeholder={props.placeholder}
     value={props.value}
-    onChange={props.onChange}
+    onChange={(event) => props.onChange(event.target.value)}
     type={props.type ?? 'text'}
     id={props.id}
     name={props.name ?? props.id}

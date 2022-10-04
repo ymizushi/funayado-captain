@@ -8,10 +8,12 @@ export type Props = {
   min: number
   max: number
   onChange: (n: number) => void
+  disabled?: boolean
 }
 
 export function VerticalRangeSlider(props: Props) {
   return <Slider 
+    disabled={props.disabled ?? false}
     value={props.value}
     min={props.min}
     max={props.max}

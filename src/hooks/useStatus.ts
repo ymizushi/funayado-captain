@@ -5,10 +5,10 @@ import { SetStateAction } from "react"
 
 export function useLocalStorage<T>(
   key: string,
-  initialState: T|null = null
-): [storage: T|null, setStorage: Dispatch<SetStateAction<T | null>>] {
+  initialState: T
+): [storage: T, setStorage: Dispatch<SetStateAction<T>>] {
   
-  const [storage, setStorage] = useState<T|null>(initialState)
+  const [storage, setStorage] = useState<T>(initialState)
 
   useEffect(() => {
     const localStorageString = localStorage.getItem(key)
@@ -17,13 +17,13 @@ export function useLocalStorage<T>(
         const localStorageJson = JSON.parse(localStorageString) as T
         setStorage(localStorageJson)
       } catch (e) {
-        setStorage(null)
+        setStorage(initialState)
       }
     }
-  }, [setStorage, key])
+  }, [setStorage, key, initialState])
 
   const setLocalStorage = useCallback(
-    (value: SetStateAction<T | null>) => {
+    (value: SetStateAction<T>) => {
       localStorage.setItem(key, JSON.stringify(value))
       setStorage(value)
     },

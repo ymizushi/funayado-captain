@@ -7,11 +7,10 @@ import { Button } from '@components/input/Button';
 import { Text } from '@components/text/Text';
 import { Input } from '@components/input/Input';
 import { VerticalRangeSlider } from '@components/input/Slider';
-import { RoomStatus, useRoomStatus } from '@hooks/useRoomStatus';
+import { initialRoomStatus, RoomStatus, useRoomStatus } from '@hooks/useRoomStatus';
 import { speak } from '@util/textToSpeech';
 import { KV, Select } from '@components/input/Select';
 const config = publicConfig
-const EventType = 'roomStatus'
 
 const Home = () => {
   const [roomId, setRoomId] = useState<string>("default-room")
@@ -19,6 +18,7 @@ const Home = () => {
   const [voices, setVoices] = useState<SpeechSynthesisVoice[]>([])
   const [voice, setVoice] = useState<SpeechSynthesisVoice|null>()
   const [lastStatus, setLastStatus] = useState<RoomStatus|null>(null)
+  const [isParent, setIsParent] = useState(false)
 
   useEffect(() => {
     window.speechSynthesis.onvoiceschanged = () => {
@@ -71,21 +71,22 @@ const Home = () => {
     }
   }
 
+  console.log(roomStatus)
+
   return (
     <VStack>
       <Component>
-        <Text>部屋選択</Text>
-        <Input id='inputRoomId' value={roomId ?? ""} onChange={(e) => roomId && setRoomId(roomId)} />
-        <Button onClick={async () => {
-          if (roomStatus) {
-            await pushRoomStatus(
-              roomId,
-              roomStatus
-            )
-          }
+        <Text>親/子</Text>
+        <Text>あなたは { isParent ? "親" : "子"} です</Text>
+        <Button disabled={isParent} onClick={async () => {
+          setIsParent(true)
         }}>
-          選択
+          親になる
         </Button>
+      </Component>
+      <Component>
+        <Text>部屋選択</Text>
+        <Input id='inputRoomId' value={roomId ?? ""} onChange={(value) => setRoomId(value)} />
       </Component>
       <Component>
         <Text>読み上げ言語選択</Text>
@@ -106,19 +107,47 @@ const Home = () => {
       <Component>
         <Text>水深</Text>
         <VerticalRangeSlider
-          value={roomStatus?.waterDepth ?? 0}
+          disabled={!isParent}
+          value={roomStatus.waterDepth}
           onChange={(n: number) => {
-            if (roomStatus) {
-              const newStatus = {
-                  ...roomStatus, 
-                  waterDepth: n
-                }
-              setRoomStatus(newStatus)
-            }
+            const newStatus = {
+                ...roomStatus, 
+                waterDepth: n
+              }
+            setRoomStatus(newStatus)
           }}
-          max={200}
           min={0}
+          max={roomStatus.maxWaterDepth}
          />
+      </Component>
+      <Component>
+        <Text>最大深度</Text>
+        <Input disabled={!isParent} id='inputMaxWaterDepth' value={roomStatus?.maxWaterDepth ?? 0} onChange={(value) => setRoomStatus(
+          {
+            ...roomStatus,
+            maxWaterDepth: parseInt(value) || 0
+          }) } />
+      </Component>
+
+      <Component>
+        <Button disabled={!isParent} onClick={async () => {
+          if (roomStatus) {
+            await pushRoomStatus(
+              roomId,
+              roomStatus
+            )
+          }
+        }}>
+          送信
+        </Button>
+      </Component>
+
+      <Component>
+        <Button onClick={async () => {
+          setRoomStatus(initialRoomStatus)
+        }}>
+          ローカルストレージを初期化
+        </Button>
       </Component>
     </VStack>
   );
