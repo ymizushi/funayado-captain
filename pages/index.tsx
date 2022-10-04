@@ -19,6 +19,8 @@ const Home = () => {
   const [voice, setVoice] = useState<SpeechSynthesisVoice|null>()
   const [lastStatus, setLastStatus] = useState<RoomStatus|null>(null)
   const [isParent, setIsParent] = useState(false)
+  const [fishSize, setFishSize] = useState<string|null>(null)
+  const [fishAmount, setFishAmount] = useState<string|null>(null)
 
   useEffect(() => {
     window.speechSynthesis.onvoiceschanged = () => {
@@ -49,10 +51,12 @@ const Home = () => {
 
   useEffect(() => {
     if (lastStatus && voice) {
-      speak(lastStatus.waterDepth.toString()+"メートル\n", voice)
+      speak(`水深は${lastStatus.waterDepth.toString()}メートルです.
+      魚の数は${fishAmount}です
+      魚の大きさは${fishSize}です
+      `, voice)
     }
   }, [lastStatus, voice])
-
 
   const pushRoomStatus = async (roomId: string, data: RoomStatus|null) => {
     const res = await fetch("/api/socket", {
@@ -127,6 +131,40 @@ const Home = () => {
             ...roomStatus,
             maxWaterDepth: parseInt(value) || 0
           }) } />
+      </Component>
+
+      <Component>
+        <Text>魚の大きさ</Text>
+        <Select 
+          name={'selectFishSize'}
+          id={'selectFishSize'} 
+          values={["", "大きい", "普通", "小さい"].map(v => ({
+            key: v,
+            name: v,
+            value: v
+          }))}         
+          onChange={(value: KV<string>) => {
+            setFishSize(value.value === "" ? null: value.value )
+          }
+          }
+          />
+      </Component>
+
+      <Component>
+        <Text>魚の数</Text>
+        <Select 
+          name={'selectFishSize'}
+          id={'selectFishSize'} 
+          values={["", "たくさん", "普通", "少ない"].map(v => ({
+            key: v,
+            name: v,
+            value: v
+          }))}         
+          onChange={(value: KV<string>) => {
+            setFishAmount(value.value === "" ? null: value.value )
+          }
+          }
+          />
       </Component>
 
       <Component>
