@@ -197,6 +197,18 @@ const Home = () => {
           ローカルストレージを初期化
         </Button>
       </Component>
+
+      <Component>
+        <Button onClick={async () => {
+          var u = new SpeechSynthesisUtterance();
+          u.text = "こんにちは";
+          u.lang = 'ja-JP';
+          u.rate = 1.0;
+          speechSynthesis.speak(u);
+        }}>
+          スピーチできるボタン
+        </Button>
+      </Component>
     </VStack>
   );
 }
