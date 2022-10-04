@@ -23,6 +23,7 @@ const Home = () => {
   const [fishAmount, setFishAmount] = useState<string|null>(null)
 
   useEffect(() => {
+
     window.speechSynthesis.onvoiceschanged = () => {
       setVoices(window.speechSynthesis.getVoices())
       if (window.speechSynthesis.getVoices().length > 0) {
@@ -51,6 +52,15 @@ const Home = () => {
 
   useEffect(() => {
     if (lastStatus && voice) {
+      var u = new SpeechSynthesisUtterance();
+      u.text = "こんにちは";
+      u.lang = 'ja-JP';
+      u.rate = 1.0;
+      speechSynthesis.speak(u);
+
+
+
+
       speak(`水深は${lastStatus.waterDepth.toString()}メートルです.
       魚の数は${fishAmount}です
       魚の大きさは${fishSize}です
