@@ -6,7 +6,6 @@ function MyApp({ Component, pageProps }: AppProps) {
   return <>
       <Head>
         <title>funayado-captain</title>
-        <link href="https://fonts.googleapis.com/earlyaccess/nicomoji.css" rel="stylesheet" />
       </Head>
       <Component {...pageProps} />
     </>
