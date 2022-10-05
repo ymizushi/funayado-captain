@@ -10,10 +10,12 @@
   },
   "dependencies": {
     "@types/cors": "^2.8.12",
+    "classnames": "^2.3.2",
     "cors": "^2.8.5",
     "fs": "^0.0.1-security",
     "net": "^1.0.2",
     "next": "12.3.1",
+    "normalize.css": "^8.0.1",
     "pusher": "^5.1.1-beta",
     "pusher-js": "^7.4.0",
     "rc-slider": "^10.0.1",

@@ -1,0 +1,14 @@
+.twoColumnComponent {
+  margin: 0;
+}
+
+.firstColumn {
+  display: inline-block;
+  width: 120px;
+  margin-right: 100px;
+}
+
+.secondColumn {
+  display: inline-block;
+  width: 400px;
+}

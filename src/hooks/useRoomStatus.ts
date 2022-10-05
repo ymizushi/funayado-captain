@@ -4,8 +4,9 @@ const STORAGE_KEY_ROOM_STATUS = 'work.ymizushi.funayado-captain/roomStatus'
 
 export type RoomStatus = {
   waterDepth: number,
-  minWaterDepth: number,
-  maxWaterDepth: number,
+  tana: number|null,
+  size: string|null,
+  amount: string|null
 }
 
 export function useRoomStatus(
@@ -16,6 +17,7 @@ export function useRoomStatus(
 
 export const initialRoomStatus: RoomStatus = {
   waterDepth: 30,
-  minWaterDepth: 0,
-  maxWaterDepth: 100,
+  tana: null,
+  size: null,
+  amount: null,
 }
