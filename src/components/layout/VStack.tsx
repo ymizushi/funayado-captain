@@ -1,7 +1,7 @@
 import React, { PropsWithChildren } from "react";
 
 import classNames from 'classnames'
-import styles from '../../../styles/Components/layout/VStack.module.css'
+import styles from 'styles/Components/layout/VStack.module.css'
 
 export function VStack(props: PropsWithChildren) {
   return <div className={classNames(styles.div)}>

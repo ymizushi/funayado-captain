@@ -1,7 +1,7 @@
 import React, { PropsWithChildren }  from "react";
 import classNames from 'classnames'
 
-import styles from '../../../styles/Components/text/Text.module.css'
+import styles from 'styles/Components/text/Text.module.css'
 
 type TextSize = 'small'
 type TextType = 'sub'

@@ -1,6 +1,6 @@
 import React, { PropsWithChildren } from "react";
 
-import styles from '../../../styles/Components/layout/TwoColumnComponent.module.css'
+import styles from 'styles/Components/layout/TwoColumnComponent.module.css'
 
 export function TwoColumnComponent(props: PropsWithChildren) {
   return <div className={styles.twoColumnComponent}>
