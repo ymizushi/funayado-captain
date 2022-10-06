@@ -1,5 +1,7 @@
 import React, { ChangeEventHandler } from "react";
 
+import styles from 'styles/components/input/Input.module.css'
+
 type InputType = "text"
 
 type Props = {
@@ -18,6 +20,7 @@ type Props = {
 
 export function Input(props: Props) {
   return <input
+    className={styles.input}
     disabled={props.disabled}
     placeholder={props.placeholder}
     value={props.value}
@@ -28,6 +31,5 @@ export function Input(props: Props) {
     required={props.required}
     minLength={props.minLength}
     maxLength={props.maxLength}
-    size={props.size ?? 2}
   />
 }

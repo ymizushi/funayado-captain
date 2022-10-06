@@ -12,6 +12,7 @@ import { KV, Select } from '@components/input/Select';
 import { Header } from '@components/pages/Header';
 import { Hr } from '@components/decoration/Hr';
 import { FirstColumn, SecondColumn, TwoColumnComponent } from '@components/layout/TwoColumnComponent';
+import { Component } from '@components/basic/Component';
 
 const config = publicConfig
 
@@ -26,7 +27,6 @@ const Home = () => {
   const [fishAmount, setFishAmount] = useState<string|null>(null)
 
   useEffect(() => {
-
     window.speechSynthesis.onvoiceschanged = () => {
       setVoices(window.speechSynthesis.getVoices())
       if (window.speechSynthesis.getVoices().length > 0) {
@@ -55,10 +55,17 @@ const Home = () => {
 
   useEffect(() => {
     if (lastStatus && voice) {
-      speak(`水深は${lastStatus.waterDepth.toString()}メートルです.
-      魚の数は${fishAmount}です
-      魚の大きさは${fishSize}です
-      `, voice)
+      let sentence = `水深は${lastStatus.waterDepth.toString()}メートル。`
+      if (lastStatus.tana) {
+        sentence = sentence + `タナは${lastStatus.tana}メートル。`
+      }
+      if (lastStatus.size) {
+        sentence = sentence + `大きさは${lastStatus.size}。`
+      }
+      if (lastStatus.amount) {
+        sentence = sentence + `数は${lastStatus.amount}。`
+      }
+      speak(sentence, voice)
     }
   }, [lastStatus, voice])
 
@@ -90,7 +97,7 @@ const Home = () => {
         <VStackChildren>
           <TwoColumnComponent>
             <FirstColumn>
-              <Text>せんちょ/げすと</Text>
+              <Text>げすと/せんちょ</Text>
             </FirstColumn>
             <SecondColumn>
               <Select 
@@ -98,11 +105,6 @@ const Home = () => {
                 id={'selectRole'} 
                 values={[
                   {
-                    key: 'empty',
-                    name: '',
-                    value: 'empty'
-                  }
-                  ,{
                   key: 'guest',
                   name: 'げすと',
                   value: 'guest'
@@ -131,10 +133,18 @@ const Home = () => {
         </VStackChildren>
         <VStackChildren>
           <TwoColumnComponent>
-            <FirstColumn>
-              <Text>よみあげ</Text>
-            </FirstColumn>
+            <FirstColumn><Text>よみあげ</Text></FirstColumn>
             <SecondColumn>
+              <Button onClick={async () => {
+                speak(`日本語で聞こえればオーケーです。`, voice)
+              }}>
+                <Text>テスト</Text>
+              </Button>
+            </SecondColumn>
+          </TwoColumnComponent>
+        </VStackChildren>
+        <VStackChildren>
+          <Component>
               <Select 
                 name={'selectVoice'}
                 id={'selectVoice'} 
@@ -148,20 +158,7 @@ const Home = () => {
                 }
                 }
                 />
-            </SecondColumn>
-          </TwoColumnComponent>
-        </VStackChildren>
-        <VStackChildren>
-          <TwoColumnComponent>
-            <FirstColumn></FirstColumn>
-            <SecondColumn>
-              <Button onClick={async () => {
-                speak('てすと', voice)
-              }}>
-                テスト
-              </Button>
-            </SecondColumn>
-          </TwoColumnComponent>
+          </Component>
         </VStackChildren>
         <Hr />
         <VStackChildren>
@@ -169,6 +166,11 @@ const Home = () => {
             <FirstColumn>
               <Text>すいしん</Text>
             </FirstColumn>
+            <SecondColumn>
+              <Text>{roomStatus.waterDepth}m</Text>
+            </SecondColumn>
+          </TwoColumnComponent>
+          <Component>
               <VerticalRangeSlider
                 disabled={!isParent}
                 value={roomStatus.waterDepth}
@@ -182,7 +184,7 @@ const Home = () => {
                 min={0}
                 max={100}
                />
-          </TwoColumnComponent>
+          </Component>
         </VStackChildren>
         <VStackChildren>
           <TwoColumnComponent>
@@ -190,13 +192,24 @@ const Home = () => {
               <Text>たな</Text>
             </FirstColumn>
             <SecondColumn>
-              <Input disabled={!isParent} id='inputTana' value={roomStatus?.tana ?? ""} onChange={(value) => setRoomStatus(
-                {
-                  ...roomStatus,
-                  tana: parseInt(value)
-                }) } />
+              <Text>{roomStatus.tana ?? '??' }m</Text>
             </SecondColumn>
           </TwoColumnComponent>
+          <Component>
+            <VerticalRangeSlider
+              disabled={!isParent}
+              value={roomStatus.tana ?? 0 }
+              onChange={(n: number) => {
+                const newStatus = {
+                    ...roomStatus, 
+                    tana: n
+                  }
+                setRoomStatus(newStatus)
+              }}
+              min={0}
+              max={100}
+             />
+          </Component>
         </VStackChildren>
         <VStackChildren>
           <TwoColumnComponent>
@@ -205,16 +218,21 @@ const Home = () => {
             </FirstColumn>
             <SecondColumn>
               <Select 
+                disabled={!isParent}
                 name={'selectFishSize'}
                 id={'selectFishSize'} 
-                values={["", "大きい", "普通", "小さい"].map(v => ({
+                values={["", "おおきい", "ふつう", "ちいさい"].map(v => ({
                   key: v,
                   name: v,
                   value: v
                 }))}         
                 onChange={(value: KV<string>) => {
-                  setFishSize(value.value === "" ? null: value.value )
-                }
+                  const newStatus = {
+                      ...roomStatus, 
+                      size: value.value
+                    }
+                  setRoomStatus(newStatus)
+                  }
                 }
                 />
             </SecondColumn>
@@ -227,15 +245,20 @@ const Home = () => {
             </FirstColumn>
             <SecondColumn>
               <Select 
+                disabled={!isParent}
                 name={'selectFishAmount'}
                 id={'selectFishAmount'} 
-                values={["", "たくさん", "普通", "少ない"].map(v => ({
+                values={["", "たくさん", "ふつう", "すくない"].map(v => ({
                   key: v,
                   name: v,
                   value: v
                 }))}         
                 onChange={(value: KV<string>) => {
-                  setFishAmount(value.value === "" ? null: value.value )
+                  const newStatus = {
+                      ...roomStatus, 
+                      amount: value.value
+                    }
+                  setRoomStatus(newStatus)
                 }
                 }
                 />
@@ -265,13 +288,12 @@ const Home = () => {
         <VStackChildren>
           <TwoColumnComponent>
             <FirstColumn>
-              <Text>しょきか</Text>
             </FirstColumn>
             <SecondColumn>
               <Button onClick={async () => {
                 setRoomStatus(initialRoomStatus)
               }}>
-                じっこう
+                しょきかする
               </Button>
             </SecondColumn>
           </TwoColumnComponent>

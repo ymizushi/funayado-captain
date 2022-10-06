@@ -1,14 +1,12 @@
 .twoColumnComponent {
-  margin: 0;
+  display: flex;
+  flex-direction: row;
 }
 
 .firstColumn {
-  display: inline-block;
-  width: 120px;
-  margin-right: 100px;
+  width: 30%;
 }
 
 .secondColumn {
-  display: inline-block;
-  width: 400px;
+  width: 70%
 }
