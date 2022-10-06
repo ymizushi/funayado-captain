@@ -67,7 +67,7 @@ const Home = () => {
       }
       speak(sentence, voice)
     }
-  }, [lastStatus, voice])
+  }, [lastStatus])
 
   const pushRoomStatus = async (roomId: string, data: RoomStatus|null) => {
     const res = await fetch("/api/socket", {
