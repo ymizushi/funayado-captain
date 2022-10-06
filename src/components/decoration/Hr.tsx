@@ -1,4 +1,4 @@
-import React, { PropsWithChildren } from "react";
+import React from "react";
 import styles from 'styles/components/decoration/Hr.module.css'
 
 
