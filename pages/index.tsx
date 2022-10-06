@@ -13,6 +13,7 @@ import { Header } from '@components/pages/Header';
 import { Hr } from '@components/decoration/Hr';
 import { FirstColumn, SecondColumn, TwoColumnComponent } from '@components/layout/TwoColumnComponent';
 import { Component } from '@components/basic/Component';
+import { Textarea } from '@components/input/Textarea';
 
 const config = publicConfig
 
@@ -23,8 +24,7 @@ const Home = () => {
   const [voice, setVoice] = useState<SpeechSynthesisVoice|null>(null)
   const [lastStatus, setLastStatus] = useState<RoomStatus|null>(null)
   const [isParent, setIsParent] = useState(false)
-  const [fishSize, setFishSize] = useState<string|null>(null)
-  const [fishAmount, setFishAmount] = useState<string|null>(null)
+  const [eventLog, setEventLog] = useState<string>("")
 
   useEffect(() => {
     window.speechSynthesis.onvoiceschanged = () => {
@@ -43,7 +43,7 @@ const Home = () => {
       });
       let channel = channels.subscribe(roomId);
       channel.bind("roomStatus", (data: RoomStatus) => {
-        console.log("data from server", data)
+        setEventLog(before => `${before}${getNowDateWithString()}: data received\n${JSON.stringify(data)}\n\n` )
         setLastStatus(data)
       });
       return () => {
@@ -298,9 +298,31 @@ const Home = () => {
             </SecondColumn>
           </TwoColumnComponent>
         </VStackChildren>
+        <VStackChildren>
+          <TwoColumnComponent>
+            <FirstColumn>
+              <Text>イベントログ</Text>
+            </FirstColumn>
+            <SecondColumn>
+              <Textarea value={eventLog}/>
+            </SecondColumn>
+          </TwoColumnComponent>
+        </VStackChildren>
       </VStack>
     </>
   );
+}
+
+function getNowDateWithString(){
+  const dt = new Date();
+  const y = dt.getFullYear();
+  const m = ("00" + (dt.getMonth()+1)).slice(-2);
+  const d = ("00" + dt.getDate()).slice(-2);
+  const h = ("00" + dt.getHours()).slice(-2);
+  const minute = ("00" + dt.getMinutes()).slice(-2);
+  const s = ("00" + dt.getSeconds()).slice(-2);
+  const result = `${y}/${m}/${d} ${h}:${minute}:${s}`;
+  return result;
 }
 
 export default Home

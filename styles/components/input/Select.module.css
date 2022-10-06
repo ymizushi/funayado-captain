@@ -8,6 +8,6 @@
   padding: 2px;
 }
 
-.option {
+.select:disabled {
+  background-color: gray;
 }
-
