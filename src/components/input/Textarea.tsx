@@ -11,6 +11,6 @@ export function Textarea(props: Props) {
     readOnly
     className={styles.textarea}
     value={props.value}
-    rows={4}
+    rows={6}
   />
 }

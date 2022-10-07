@@ -17,6 +17,8 @@ import { Textarea } from '@components/input/Textarea';
 
 const config = publicConfig
 
+type PushStatus = "success" | "failed" | null
+
 const Home = () => {
   const [roomId, setRoomId] = useState<string>("default-room")
   const [roomStatus, setRoomStatus] = useRoomStatus(roomId)
@@ -25,6 +27,7 @@ const Home = () => {
   const [lastStatus, setLastStatus] = useState<RoomStatus|null>(null)
   const [isParent, setIsParent] = useState(false)
   const [eventLog, setEventLog] = useState<string>("")
+  const [pushStatus, setPushStatus] = useState<PushStatus>(null)
 
   useEffect(() => {
     window.speechSynthesis.onvoiceschanged = () => {
@@ -43,7 +46,7 @@ const Home = () => {
       });
       let channel = channels.subscribe(roomId);
       channel.bind("roomStatus", (data: RoomStatus) => {
-        setEventLog(before => `${before}${getNowDateWithString()}: data received\n${JSON.stringify(data)}\n\n` )
+        setEventLog(before => `${getNowDateWithString()}: data received\n${JSON.stringify(data)}\n\n${before}` )
         setLastStatus(data)
       });
       return () => {
@@ -85,11 +88,13 @@ const Home = () => {
     });
 
     if (!res.ok) {
-      console.error("failed to push data");
+      console.error("failed to push data.");
+      setPushStatus("failed")
+    } else {
+      setPushStatus("success")
+      setTimeout(() => setPushStatus(null), 2000)
     }
   }
-
-  console.log(roomStatus)
 
   return (
     <>
@@ -98,31 +103,7 @@ const Home = () => {
       </Header>
       <VStack>
         <VStackChildren>
-          <TwoColumnComponent>
-            <FirstColumn>
-              <Text>げすと/せんちょ</Text>
-            </FirstColumn>
-            <SecondColumn>
-              <Select 
-                name={'selectRole'}
-                id={'selectRole'} 
-                values={[
-                  {
-                  key: 'guest',
-                  name: 'げすと',
-                  value: 'guest'
-                }, {
-                  key: 'captain',
-                  name: 'せんちょ',
-                  value: 'captain'
-                }]}         
-                onChange={(kvVoice: KV<string>) => {
-                  return setIsParent(kvVoice.value==='captain')
-                }
-                }
-                />
-            </SecondColumn>
-          </TwoColumnComponent>
+          <CaptainComponent setIsParent={setIsParent}/>
         </VStackChildren>
         <VStackChildren>
           <TwoColumnComponent>
@@ -298,6 +279,7 @@ const Home = () => {
         <VStackChildren>
           <TwoColumnComponent>
             <FirstColumn>
+                { pushStatus ? <Component><Text>{pushStatus}</Text></Component>: null}
             </FirstColumn>
             <SecondColumn>
               <Button disabled={!isParent} onClick={async () => {
@@ -353,6 +335,36 @@ function getNowDateWithString(){
   const s = ("00" + dt.getSeconds()).slice(-2);
   const result = `${y}/${m}/${d} ${h}:${minute}:${s}`;
   return result;
+}
+
+
+function CaptainComponent({setIsParent}: {setIsParent: (isParent: boolean) => void}) {
+  return <TwoColumnComponent>
+    <FirstColumn>
+      <Text>げすと/せんちょ</Text>
+    </FirstColumn>
+    <SecondColumn>
+      <Select 
+        name={'selectRole'}
+        id={'selectRole'} 
+        values={[
+          {
+          key: 'guest',
+          name: 'げすと',
+          value: 'guest'
+        }, {
+          key: 'captain',
+          name: 'せんちょ',
+          value: 'captain'
+        }]}         
+        onChange={(kvVoice: KV<string>) => {
+          return setIsParent(kvVoice.value==='captain')
+        }
+        }
+        />
+    </SecondColumn>
+  </TwoColumnComponent>
+
 }
 
 export default Home
