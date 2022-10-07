@@ -60,10 +60,13 @@ const Home = () => {
         sentence = sentence + `タナは${lastStatus.tana}メートル。`
       }
       if (lastStatus.size) {
-        sentence = sentence + `大きさは${lastStatus.size}。`
+        sentence = sentence + `おおきさは${lastStatus.size}。`
       }
       if (lastStatus.amount) {
-        sentence = sentence + `数は${lastStatus.amount}。`
+        sentence = sentence + `かずは${lastStatus.amount}。`
+      }
+      if (lastStatus.bottomMaterial) {
+        sentence = sentence + `ていしつは、${lastStatus.bottomMaterial}。`
       }
       speak(sentence, voice)
     }
@@ -136,7 +139,7 @@ const Home = () => {
             <FirstColumn><Text>よみあげ</Text></FirstColumn>
             <SecondColumn>
               <Button onClick={async () => {
-                speak(`日本語で聞こえればオーケーです。`, voice)
+                speak(`日本語で聞こえれば、オーケーです。`, voice)
               }}>
                 <Text>テスト</Text>
               </Button>
@@ -257,6 +260,33 @@ const Home = () => {
                   const newStatus = {
                       ...roomStatus, 
                       amount: value.value
+                    }
+                  setRoomStatus(newStatus)
+                }
+                }
+                />
+            </SecondColumn>
+          </TwoColumnComponent>
+        </VStackChildren>
+        <VStackChildren>
+          <TwoColumnComponent>
+            <FirstColumn>
+              <Text>ていしつ</Text>
+            </FirstColumn>
+            <SecondColumn>
+              <Select 
+                disabled={!isParent}
+                name={'selectBottomMaterial'}
+                id={'selectBottomMaterial'} 
+                values={["", "いわ", "すな"].map(v => ({
+                  key: v,
+                  name: v,
+                  value: v
+                }))}         
+                onChange={(value: KV<string>) => {
+                  const newStatus = {
+                      ...roomStatus, 
+                      bottomMaterial: value.value
                     }
                   setRoomStatus(newStatus)
                 }

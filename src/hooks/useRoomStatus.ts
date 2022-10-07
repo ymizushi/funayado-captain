@@ -6,7 +6,8 @@ export type RoomStatus = {
   waterDepth: number,
   tana: number|null,
   size: string|null,
-  amount: string|null
+  amount: string|null,
+  bottomMaterial: string|null
 }
 
 export function useRoomStatus(
@@ -20,4 +21,5 @@ export const initialRoomStatus: RoomStatus = {
   tana: null,
   size: null,
   amount: null,
+  bottomMaterial: null
 }
