@@ -1,10 +1,10 @@
 .header {
-  background-color: #5479FD;
+  background-color: #5479fd;
   height: 62px;
-  display:flex;
+  display: flex;
 }
 
 .headerTextDiv {
-  flex:0 0 auto;
-  margin:auto;
+  flex: 0 0 auto;
+  margin: auto;
 }

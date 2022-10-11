@@ -1,81 +1,96 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from "react";
 import Pusher from "pusher-js";
-import { publicConfig } from '@config';
-import { VStack, VStackChildren } from '@components/layout/VStack';
-import { Button } from '@components/input/Button';
-import { Text } from '@components/text/Text';
-import { Input } from '@components/input/Input';
-import { VerticalRangeSlider } from '@components/input/Slider';
-import { initialRoomStatus, RoomStatus, useRoomStatus } from '@hooks/useRoomStatus';
-import { speak } from '@util/textToSpeech';
-import { KV, Select } from '@components/input/Select';
-import { Header } from '@components/pages/Header';
-import { Hr } from '@components/decoration/Hr';
-import { FirstColumn, SecondColumn, TwoColumnComponent } from '@components/layout/TwoColumnComponent';
-import { Component } from '@components/basic/Component';
-import { Textarea } from '@components/input/Textarea';
+import { publicConfig } from "@config";
+import { VStack, VStackChildren } from "@components/layout/VStack";
+import { Button } from "@components/input/Button";
+import { Text } from "@components/text/Text";
+import { Input } from "@components/input/Input";
+import { VerticalRangeSlider } from "@components/input/Slider";
+import {
+  initialRoomStatus,
+  RoomStatus,
+  useRoomStatus,
+} from "@hooks/useRoomStatus";
+import { speak } from "@util/textToSpeech";
+import { KV, Select } from "@components/input/Select";
+import { Header } from "@components/pages/Header";
+import { Hr } from "@components/decoration/Hr";
+import {
+  FirstColumn,
+  SecondColumn,
+  TwoColumnComponent,
+} from "@components/layout/TwoColumnComponent";
+import { Component } from "@components/basic/Component";
+import { Textarea } from "@components/input/Textarea";
 
-const config = publicConfig
+const config = publicConfig;
 
-type PushStatus = "success" | "failed" | null
+type PushStatus = "success" | "failed" | null;
 
 const Home = () => {
-  const [roomId, setRoomId] = useState<string>("default-room")
-  const [roomStatus, setRoomStatus] = useRoomStatus(roomId)
-  const [voices, setVoices] = useState<SpeechSynthesisVoice[]>([])
-  const [voice, setVoice] = useState<SpeechSynthesisVoice|null>(null)
-  const [lastStatus, setLastStatus] = useState<RoomStatus|null>(null)
-  const [isParent, setIsParent] = useState(false)
-  const [eventLog, setEventLog] = useState<string>("")
-  const [pushStatus, setPushStatus] = useState<PushStatus>(null)
+  const [roomId, setRoomId] = useState<string>("default-room");
+  const [roomStatus, setRoomStatus] = useRoomStatus(roomId);
+  const [voices, setVoices] = useState<SpeechSynthesisVoice[]>([]);
+  const [voice, setVoice] = useState<SpeechSynthesisVoice | null>(null);
+  const [lastStatus, setLastStatus] = useState<RoomStatus | null>(null);
+  const [isParent, setIsParent] = useState(false);
+  const [eventLog, setEventLog] = useState<string>("");
+  const [pushStatus, setPushStatus] = useState<PushStatus>(null);
 
   useEffect(() => {
     window.speechSynthesis.onvoiceschanged = () => {
-      setVoices(window.speechSynthesis.getVoices())
+      setVoices(window.speechSynthesis.getVoices());
       if (window.speechSynthesis.getVoices().length > 0) {
-        setVoice(window.speechSynthesis.getVoices()[0])
+        setVoice(window.speechSynthesis.getVoices()[0]);
       }
     };
-    setVoices(window.speechSynthesis.getVoices())
+    setVoices(window.speechSynthesis.getVoices());
     if (window.speechSynthesis.getVoices().length > 0) {
-      setVoice(window.speechSynthesis.getVoices()[0])
+      setVoice(window.speechSynthesis.getVoices()[0]);
     }
     if (roomId) {
-      const channels = new Pusher(config.pusher.key , {
+      const channels = new Pusher(config.pusher.key, {
         cluster: config.pusher.cluster,
       });
       let channel = channels.subscribe(roomId);
       channel.bind("roomStatus", (data: RoomStatus) => {
-        setEventLog(before => `${getNowDateWithString()}: data received\n${JSON.stringify(data)}\n\n${before}` )
-        setLastStatus(data)
+        setEventLog(
+          (before) =>
+            `${getNowDateWithString()}: data received\n${JSON.stringify(
+              data
+            )}\n\n${before}`
+        );
+        setLastStatus(data);
       });
       return () => {
-        channel.unbind('roomStatus')
+        channel.unbind("roomStatus");
         channels.unsubscribe(roomId);
-      }
-    } 
+      };
+    }
   }, [roomId]);
 
   useEffect(() => {
     if (lastStatus && voice) {
-      let sentence = `水深は${lastStatus.waterDepth.toString()}メートル。`
+      let sentence = `水深は${lastStatus.waterDepth.toString()}メートル。`;
       if (lastStatus.tana) {
-        sentence = sentence + `タナは${lastStatus.tana}メートル。`
+        sentence = sentence + `タナは${lastStatus.tana}メートル。`;
       }
       if (lastStatus.size) {
-        sentence = sentence + `おおきさは${lastStatus.size}。`
+        sentence = sentence + `おおきさは${lastStatus.size}。`;
       }
       if (lastStatus.amount) {
-        sentence = sentence + `かずは${lastStatus.amount}。`
+        sentence = sentence + `かずは${lastStatus.amount}。`;
       }
       if (lastStatus.bottomMaterial) {
-        sentence = sentence + `ていしつは、${lastStatus.bottomMaterial}。`
+        sentence = sentence + `ていしつは、${lastStatus.bottomMaterial}。`;
       }
-      speak(sentence, voice)
+      speak(sentence, voice);
     }
-  }, [lastStatus])
+    // voiceが変わったとしても再実行させたくないので、dependency list には含めない
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lastStatus]);
 
-  const pushRoomStatus = async (roomId: string, data: RoomStatus|null) => {
+  const pushRoomStatus = async (roomId: string, data: RoomStatus | null) => {
     const res = await fetch("/api/socket", {
       method: "POST",
       headers: {
@@ -83,27 +98,27 @@ const Home = () => {
       },
       body: JSON.stringify({
         roomId: roomId,
-        status: data
+        status: data,
       }),
     });
 
     if (!res.ok) {
       console.error("failed to push data.");
-      setPushStatus("failed")
+      setPushStatus("failed");
     } else {
-      setPushStatus("success")
-      setTimeout(() => setPushStatus(null), 2000)
+      setPushStatus("success");
+      setTimeout(() => setPushStatus(null), 2000);
     }
-  }
+  };
 
   return (
     <>
       <Header>
-        <Text type={'sub'}>funayado-captain</Text>
+        <Text type={"sub"}>funayado-captain</Text>
       </Header>
       <VStack>
         <VStackChildren>
-          <CaptainComponent setIsParent={setIsParent}/>
+          <CaptainComponent setIsParent={setIsParent} />
         </VStackChildren>
         <VStackChildren>
           <TwoColumnComponent>
@@ -111,17 +126,25 @@ const Home = () => {
               <Text>へや</Text>
             </FirstColumn>
             <SecondColumn>
-              <Input id='inputRoomId' value={roomId ?? ""} onChange={(value) => setRoomId(value)} />
+              <Input
+                id="inputRoomId"
+                value={roomId ?? ""}
+                onChange={(value) => setRoomId(value)}
+              />
             </SecondColumn>
           </TwoColumnComponent>
         </VStackChildren>
         <VStackChildren>
           <TwoColumnComponent>
-            <FirstColumn><Text>よみあげ</Text></FirstColumn>
+            <FirstColumn>
+              <Text>よみあげ</Text>
+            </FirstColumn>
             <SecondColumn>
-              <Button onClick={async () => {
-                speak(`日本語で聞こえれば、オーケーです。`, voice)
-              }}>
+              <Button
+                onClick={async () => {
+                  speak(`日本語で聞こえれば、オーケーです。`, voice);
+                }}
+              >
                 <Text>テスト</Text>
               </Button>
             </SecondColumn>
@@ -129,19 +152,18 @@ const Home = () => {
         </VStackChildren>
         <VStackChildren>
           <Component>
-              <Select 
-                name={'selectVoice'}
-                id={'selectVoice'} 
-                values={voices.map(v => ({
-                  key: v.name,
-                  name: v.name,
-                  value: v
-                }))}         
-                onChange={(kvVoice: KV<SpeechSynthesisVoice>) => {
-                  return setVoice(kvVoice.value)
-                }
-                }
-                />
+            <Select
+              name={"selectVoice"}
+              id={"selectVoice"}
+              values={voices.map((v) => ({
+                key: v.name,
+                name: v.name,
+                value: v,
+              }))}
+              onChange={(kvVoice: KV<SpeechSynthesisVoice>) => {
+                return setVoice(kvVoice.value);
+              }}
+            />
           </Component>
         </VStackChildren>
         <Hr />
@@ -155,19 +177,19 @@ const Home = () => {
             </SecondColumn>
           </TwoColumnComponent>
           <Component>
-              <VerticalRangeSlider
-                disabled={!isParent}
-                value={roomStatus.waterDepth}
-                onChange={(n: number) => {
-                  const newStatus = {
-                      ...roomStatus, 
-                      waterDepth: n
-                    }
-                  setRoomStatus(newStatus)
-                }}
-                min={0}
-                max={100}
-               />
+            <VerticalRangeSlider
+              disabled={!isParent}
+              value={roomStatus.waterDepth}
+              onChange={(n: number) => {
+                const newStatus = {
+                  ...roomStatus,
+                  waterDepth: n,
+                };
+                setRoomStatus(newStatus);
+              }}
+              min={0}
+              max={100}
+            />
           </Component>
         </VStackChildren>
         <VStackChildren>
@@ -176,23 +198,23 @@ const Home = () => {
               <Text>たな</Text>
             </FirstColumn>
             <SecondColumn>
-              <Text>{roomStatus.tana ?? '??' }m</Text>
+              <Text>{roomStatus.tana ?? "??"}m</Text>
             </SecondColumn>
           </TwoColumnComponent>
           <Component>
             <VerticalRangeSlider
               disabled={!isParent}
-              value={roomStatus.tana ?? 0 }
+              value={roomStatus.tana ?? 0}
               onChange={(n: number) => {
                 const newStatus = {
-                    ...roomStatus, 
-                    tana: n
-                  }
-                setRoomStatus(newStatus)
+                  ...roomStatus,
+                  tana: n,
+                };
+                setRoomStatus(newStatus);
               }}
               min={0}
               max={100}
-             />
+            />
           </Component>
         </VStackChildren>
         <VStackChildren>
@@ -201,24 +223,23 @@ const Home = () => {
               <Text>おおきさ</Text>
             </FirstColumn>
             <SecondColumn>
-              <Select 
+              <Select
                 disabled={!isParent}
-                name={'selectFishSize'}
-                id={'selectFishSize'} 
-                values={["", "おおきい", "ふつう", "ちいさい"].map(v => ({
+                name={"selectFishSize"}
+                id={"selectFishSize"}
+                values={["", "おおきい", "ふつう", "ちいさい"].map((v) => ({
                   key: v,
                   name: v,
-                  value: v
-                }))}         
+                  value: v,
+                }))}
                 onChange={(value: KV<string>) => {
                   const newStatus = {
-                      ...roomStatus, 
-                      size: value.value
-                    }
-                  setRoomStatus(newStatus)
-                  }
-                }
-                />
+                    ...roomStatus,
+                    size: value.value,
+                  };
+                  setRoomStatus(newStatus);
+                }}
+              />
             </SecondColumn>
           </TwoColumnComponent>
         </VStackChildren>
@@ -228,24 +249,23 @@ const Home = () => {
               <Text>かず</Text>
             </FirstColumn>
             <SecondColumn>
-              <Select 
+              <Select
                 disabled={!isParent}
-                name={'selectFishAmount'}
-                id={'selectFishAmount'} 
-                values={["", "たくさん", "ふつう", "すくない"].map(v => ({
+                name={"selectFishAmount"}
+                id={"selectFishAmount"}
+                values={["", "たくさん", "ふつう", "すくない"].map((v) => ({
                   key: v,
                   name: v,
-                  value: v
-                }))}         
+                  value: v,
+                }))}
                 onChange={(value: KV<string>) => {
                   const newStatus = {
-                      ...roomStatus, 
-                      amount: value.value
-                    }
-                  setRoomStatus(newStatus)
-                }
-                }
-                />
+                    ...roomStatus,
+                    amount: value.value,
+                  };
+                  setRoomStatus(newStatus);
+                }}
+              />
             </SecondColumn>
           </TwoColumnComponent>
         </VStackChildren>
@@ -255,41 +275,44 @@ const Home = () => {
               <Text>ていしつ</Text>
             </FirstColumn>
             <SecondColumn>
-              <Select 
+              <Select
                 disabled={!isParent}
-                name={'selectBottomMaterial'}
-                id={'selectBottomMaterial'} 
-                values={["", "いわ", "すな"].map(v => ({
+                name={"selectBottomMaterial"}
+                id={"selectBottomMaterial"}
+                values={["", "いわ", "すな"].map((v) => ({
                   key: v,
                   name: v,
-                  value: v
-                }))}         
+                  value: v,
+                }))}
                 onChange={(value: KV<string>) => {
                   const newStatus = {
-                      ...roomStatus, 
-                      bottomMaterial: value.value
-                    }
-                  setRoomStatus(newStatus)
-                }
-                }
-                />
+                    ...roomStatus,
+                    bottomMaterial: value.value,
+                  };
+                  setRoomStatus(newStatus);
+                }}
+              />
             </SecondColumn>
           </TwoColumnComponent>
         </VStackChildren>
         <VStackChildren>
           <TwoColumnComponent>
             <FirstColumn>
-                { pushStatus ? <Component><Text>{pushStatus}</Text></Component>: null}
+              {pushStatus ? (
+                <Component>
+                  <Text>{pushStatus}</Text>
+                </Component>
+              ) : null}
             </FirstColumn>
             <SecondColumn>
-              <Button disabled={!isParent} onClick={async () => {
-                if (roomStatus) {
-                  await pushRoomStatus(
-                    roomId,
-                    roomStatus
-                  )
-                }
-              }}>
+              <Button
+                disabled={!isParent}
+                onClick={async () => {
+                  if (roomStatus) {
+                    await pushRoomStatus(roomId, roomStatus);
+                  }
+                }}
+              >
                 そうしん
               </Button>
             </SecondColumn>
@@ -299,12 +322,13 @@ const Home = () => {
 
         <VStackChildren>
           <TwoColumnComponent>
-            <FirstColumn>
-            </FirstColumn>
+            <FirstColumn></FirstColumn>
             <SecondColumn>
-              <Button onClick={async () => {
-                setRoomStatus(initialRoomStatus)
-              }}>
+              <Button
+                onClick={async () => {
+                  setRoomStatus(initialRoomStatus);
+                }}
+              >
                 しょきかする
               </Button>
             </SecondColumn>
@@ -316,19 +340,19 @@ const Home = () => {
               <Text>イベントログ</Text>
             </FirstColumn>
             <SecondColumn>
-              <Textarea value={eventLog}/>
+              <Textarea value={eventLog} />
             </SecondColumn>
           </TwoColumnComponent>
         </VStackChildren>
       </VStack>
     </>
   );
-}
+};
 
-function getNowDateWithString(){
+function getNowDateWithString() {
   const dt = new Date();
   const y = dt.getFullYear();
-  const m = ("00" + (dt.getMonth()+1)).slice(-2);
+  const m = ("00" + (dt.getMonth() + 1)).slice(-2);
   const d = ("00" + dt.getDate()).slice(-2);
   const h = ("00" + dt.getHours()).slice(-2);
   const minute = ("00" + dt.getMinutes()).slice(-2);
@@ -337,34 +361,39 @@ function getNowDateWithString(){
   return result;
 }
 
-
-function CaptainComponent({setIsParent}: {setIsParent: (isParent: boolean) => void}) {
-  return <TwoColumnComponent>
-    <FirstColumn>
-      <Text>げすと/せんちょ</Text>
-    </FirstColumn>
-    <SecondColumn>
-      <Select 
-        name={'selectRole'}
-        id={'selectRole'} 
-        values={[
-          {
-          key: 'guest',
-          name: 'げすと',
-          value: 'guest'
-        }, {
-          key: 'captain',
-          name: 'せんちょ',
-          value: 'captain'
-        }]}         
-        onChange={(kvVoice: KV<string>) => {
-          return setIsParent(kvVoice.value==='captain')
-        }
-        }
+function CaptainComponent({
+  setIsParent,
+}: {
+  setIsParent: (isParent: boolean) => void;
+}) {
+  return (
+    <TwoColumnComponent>
+      <FirstColumn>
+        <Text>げすと/せんちょ</Text>
+      </FirstColumn>
+      <SecondColumn>
+        <Select
+          name={"selectRole"}
+          id={"selectRole"}
+          values={[
+            {
+              key: "guest",
+              name: "げすと",
+              value: "guest",
+            },
+            {
+              key: "captain",
+              name: "せんちょ",
+              value: "captain",
+            },
+          ]}
+          onChange={(kvVoice: KV<string>) => {
+            return setIsParent(kvVoice.value === "captain");
+          }}
         />
-    </SecondColumn>
-  </TwoColumnComponent>
-
+      </SecondColumn>
+    </TwoColumnComponent>
+  );
 }
 
-export default Home
+export default Home;
