@@ -1,4 +1,4 @@
-# funayado-captain
+# funayado-captain [![Node.js CI](https://github.com/ymizushi/funayado-captain/actions/workflows/node.js.yml/badge.svg)](https://github.com/ymizushi/funayado-captain/actions/workflows/node.js.yml)
 
 ![funayado-captain vercel app_(iPhone SE)](https://user-images.githubusercontent.com/788785/195140757-fb4be861-4fba-4e44-b536-2a07b2030afb.png)
 
