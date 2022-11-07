@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Pusher from "pusher-js";
 import { publicConfig } from "@config";
 import { VStack, VStackChildren } from "@components/layout/VStack";
@@ -6,6 +6,7 @@ import { Button } from "@components/input/Button";
 import { Text } from "@components/text/Text";
 import { Input } from "@components/input/Input";
 import { VerticalRangeSlider } from "@components/input/Slider";
+import { Dispatch, SetStateAction } from "react";
 import {
   initialRoomStatus,
   RoomStatus,
@@ -22,6 +23,7 @@ import {
 } from "@components/layout/TwoColumnComponent";
 import { Component } from "@components/basic/Component";
 import { Textarea } from "@components/input/Textarea";
+import { MemberSetting } from "./setting/MemberSetting";
 
 const config = publicConfig;
 
@@ -37,6 +39,8 @@ const Home = () => {
   const [eventLog, setEventLog] = useState<string>("");
   const [pushStatus, setPushStatus] = useState<PushStatus>(null);
 
+  const [imageCapture, setImageCapture] = useState<ImageCapture|null>(null);
+    
   useEffect(() => {
     window.speechSynthesis.onvoiceschanged = () => {
       setVoices(window.speechSynthesis.getVoices());
@@ -117,55 +121,13 @@ const Home = () => {
         <Text type={"sub"}>funayado-captain</Text>
       </Header>
       <VStack>
-        <VStackChildren>
-          <CaptainComponent setIsParent={setIsParent} />
-        </VStackChildren>
-        <VStackChildren>
-          <TwoColumnComponent>
-            <FirstColumn>
-              <Text>へや</Text>
-            </FirstColumn>
-            <SecondColumn>
-              <Input
-                id="inputRoomId"
-                value={roomId ?? ""}
-                onChange={(value) => setRoomId(value)}
-              />
-            </SecondColumn>
-          </TwoColumnComponent>
-        </VStackChildren>
-        <VStackChildren>
-          <TwoColumnComponent>
-            <FirstColumn>
-              <Text>よみあげ</Text>
-            </FirstColumn>
-            <SecondColumn>
-              <Button
-                onClick={async () => {
-                  speak(`日本語で聞こえれば、オーケーです。`, voice);
-                }}
-              >
-                <Text>テスト</Text>
-              </Button>
-            </SecondColumn>
-          </TwoColumnComponent>
-        </VStackChildren>
-        <VStackChildren>
-          <Component>
-            <Select
-              name={"selectVoice"}
-              id={"selectVoice"}
-              values={voices.map((v) => ({
-                key: v.name,
-                name: v.name,
-                value: v,
-              }))}
-              onChange={(kvVoice: KV<SpeechSynthesisVoice>) => {
-                return setVoice(kvVoice.value);
-              }}
-            />
-          </Component>
-        </VStackChildren>
+        <MemberSetting
+         setIsParent={setIsParent}
+         roomId={roomId}
+         setRoomId={setRoomId}
+         voice={voice}
+         setVoice={setVoice}
+         voices={voices} setVoices={setVoices} />
         <Hr />
         <VStackChildren>
           <TwoColumnComponent>
@@ -344,6 +306,29 @@ const Home = () => {
             </SecondColumn>
           </TwoColumnComponent>
         </VStackChildren>
+        <VStackChildren>
+          <Video setImageCapture={setImageCapture} />
+          <canvas id="canvas"></canvas>
+
+          <Button
+            onClick={async () => {
+              imageCapture?.grabFrame()
+              .then(imageBitmap => {
+                console.log("onGrabFrameButtonClick")
+                const canvas = document.querySelector('canvas');
+                if (canvas) {
+                  canvas.width = imageBitmap.width
+                  canvas.height = imageBitmap.height
+                  canvas.getContext('2d')?.drawImage(imageBitmap, 0, 0);
+                  canvas.classList.remove('hidden')
+                }
+              })
+              .catch(error => console.log(error));
+            }}
+          >
+            <Text>録画</Text>
+          </Button>
+        </VStackChildren>
       </VStack>
     </>
   );
@@ -361,39 +346,25 @@ function getNowDateWithString() {
   return result;
 }
 
-function CaptainComponent({
-  setIsParent,
-}: {
-  setIsParent: (isParent: boolean) => void;
-}) {
-  return (
-    <TwoColumnComponent>
-      <FirstColumn>
-        <Text>げすと/せんちょ</Text>
-      </FirstColumn>
-      <SecondColumn>
-        <Select
-          name={"selectRole"}
-          id={"selectRole"}
-          values={[
-            {
-              key: "guest",
-              name: "げすと",
-              value: "guest",
-            },
-            {
-              key: "captain",
-              name: "せんちょ",
-              value: "captain",
-            },
-          ]}
-          onChange={(kvVoice: KV<string>) => {
-            return setIsParent(kvVoice.value === "captain");
-          }}
-        />
-      </SecondColumn>
-    </TwoColumnComponent>
-  );
+
+
+function Video({setImageCapture}: {setImageCapture:  Dispatch<SetStateAction<ImageCapture | null>>}) {
+  const ref = useRef<HTMLVideoElement|null>(null)
+  useEffect(() => {
+    navigator.mediaDevices.getUserMedia({video: true})
+      .then(mediaStream => {
+        const video = ref.current
+        if (video) {
+          video.srcObject = mediaStream
+          console.log(mediaStream)
+        }
+      
+        const track = mediaStream.getVideoTracks()[0];
+        setImageCapture(new ImageCapture(track))
+      })
+      .catch(error => console.log(`imageCapture failed: ${error}`));
+    }, [])
+  return <video ref={ref} autoPlay></video>
 }
 
 export default Home;
