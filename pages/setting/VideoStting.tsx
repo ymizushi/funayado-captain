@@ -1,42 +1,17 @@
 import { Button } from "@components/input/Button";
 import { VStackChildren } from "@components/layout/VStack";
-import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 import { Text } from "@components/text/Text";
-
-function Video({
-  setImageCapture,
-}: {
-  setImageCapture: Dispatch<SetStateAction<ImageCapture | null>>;
-}) {
-  const ref = useRef<HTMLVideoElement | null>(null);
-  useEffect(() => {
-    navigator.mediaDevices
-      .getUserMedia({ video: true })
-      .then((mediaStream) => {
-        const video = ref.current;
-        if (video) {
-          video.srcObject = mediaStream;
-          console.log(mediaStream);
-        }
-
-        const track = mediaStream.getVideoTracks()[0];
-        setImageCapture(new ImageCapture(track));
-      })
-      .catch((error) => console.log(`imageCapture failed: ${error}`));
-  }, []);
-  return <video ref={ref} autoPlay></video>;
-}
+import { useVideo } from "@hooks/useVideo";
 
 export type VideoSettingProps = {};
 
 export function VideoSetting({}: VideoSettingProps) {
-  const [imageCapture, setImageCapture] = useState<ImageCapture | null>(null);
+  const [imageCapture, ref] = useVideo()
   return (
     <>
       <VStackChildren>
-        <Video setImageCapture={setImageCapture} />
+        <video ref={ref} autoPlay></video>
         <canvas id="canvas"></canvas>
-
         <Button
           onClick={async () => {
             imageCapture

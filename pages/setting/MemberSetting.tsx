@@ -19,7 +19,6 @@ type MemberSettingProps = {
   voice: SpeechSynthesisVoice | null;
   setVoice: Dispatch<SetStateAction<SpeechSynthesisVoice | null>>;
   voices: SpeechSynthesisVoice[];
-  setVoices: Dispatch<SetStateAction<SpeechSynthesisVoice[]>>;
 };
 
 export function MemberSetting({
@@ -29,7 +28,6 @@ export function MemberSetting({
   voice,
   setVoice,
   voices,
-  setVoices,
 }: MemberSettingProps) {
   return (
     <>
