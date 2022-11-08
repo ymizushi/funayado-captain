@@ -8,7 +8,6 @@ import { Dispatch, SetStateAction } from "react";
 import { Component } from "@components/basic/Component";
 import { Text } from "@components/text/Text"
 
-
 type MemberSettingProps = {
   setIsParent: Dispatch<SetStateAction<boolean>>
   roomId: string
