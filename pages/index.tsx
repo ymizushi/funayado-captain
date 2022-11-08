@@ -3,10 +3,7 @@ import Pusher from "pusher-js";
 import { publicConfig } from "@config";
 import { VStack } from "@components/layout/VStack";
 import { Text } from "@components/text/Text";
-import {
-  RoomStatus,
-  useRoomStatus,
-} from "@hooks/useRoomStatus";
+import { RoomStatus, useRoomStatus } from "@hooks/useRoomStatus";
 import { getNowDateWithString, speak } from "@util/textToSpeech";
 import { Header } from "@components/pages/Header";
 import { Hr } from "@components/decoration/Hr";
@@ -29,7 +26,6 @@ const Home = () => {
   const [eventLog, setEventLog] = useState<string>("");
   const [pushStatus, setPushStatus] = useState<PushStatus>(null);
 
-    
   useEffect(() => {
     window.speechSynthesis.onvoiceschanged = () => {
       setVoices(window.speechSynthesis.getVoices());
@@ -83,7 +79,6 @@ const Home = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [lastStatus]);
 
-
   return (
     <>
       <Header>
@@ -91,12 +86,14 @@ const Home = () => {
       </Header>
       <VStack>
         <MemberSetting
-         setIsParent={setIsParent}
-         roomId={roomId}
-         setRoomId={setRoomId}
-         voice={voice}
-         setVoice={setVoice}
-         voices={voices} setVoices={setVoices} />
+          setIsParent={setIsParent}
+          roomId={roomId}
+          setRoomId={setRoomId}
+          voice={voice}
+          setVoice={setVoice}
+          voices={voices}
+          setVoices={setVoices}
+        />
         <Hr />
         <ConditionSetting
           roomStatus={roomStatus}
