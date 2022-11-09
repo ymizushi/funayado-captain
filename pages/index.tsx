@@ -1,16 +1,17 @@
 import { useEffect, useState } from "react";
-import Pusher from "pusher-js";
 import { publicConfig } from "@config";
 import { VStack } from "@components/layout/VStack";
 import { Text } from "@components/text/Text";
-import { RoomStatus, useRoomStatus } from "@hooks/useRoomStatus";
-import { getNowDateWithString, speak } from "@util/textToSpeech";
+import { useRoomStatus } from "@hooks/useRoomStatus";
+import { speak } from "@util/textToSpeech";
 import { Header } from "@components/pages/Header";
 import { Hr } from "@components/decoration/Hr";
 import { MemberSetting } from "./setting/MemberSetting";
 import { ConditionSetting } from "./setting/ConditionSetting";
 import { SystemSetting } from "./setting/SystemSetting";
-import { VideoSetting } from "./setting/VideoStting";
+import { VideoSetting } from "./setting/VideoSetting";
+import { useSpeech } from "@hooks/useSpeech";
+import { useChannel } from "@hooks/useChannel";
 
 const config = publicConfig;
 
@@ -19,44 +20,11 @@ export type PushStatus = "success" | "failed" | null;
 const Home = () => {
   const [roomId, setRoomId] = useState<string>("default-room");
   const [roomStatus, setRoomStatus] = useRoomStatus(roomId);
-  const [voices, setVoices] = useState<SpeechSynthesisVoice[]>([]);
-  const [voice, setVoice] = useState<SpeechSynthesisVoice | null>(null);
-  const [lastStatus, setLastStatus] = useState<RoomStatus | null>(null);
   const [isParent, setIsParent] = useState(false);
-  const [eventLog, setEventLog] = useState<string>("");
   const [pushStatus, setPushStatus] = useState<PushStatus>(null);
 
-  useEffect(() => {
-    window.speechSynthesis.onvoiceschanged = () => {
-      setVoices(window.speechSynthesis.getVoices());
-      if (window.speechSynthesis.getVoices().length > 0) {
-        setVoice(window.speechSynthesis.getVoices()[0]);
-      }
-    };
-    setVoices(window.speechSynthesis.getVoices());
-    if (window.speechSynthesis.getVoices().length > 0) {
-      setVoice(window.speechSynthesis.getVoices()[0]);
-    }
-    if (roomId) {
-      const channels = new Pusher(config.pusher.key, {
-        cluster: config.pusher.cluster,
-      });
-      let channel = channels.subscribe(roomId);
-      channel.bind("roomStatus", (data: RoomStatus) => {
-        setEventLog(
-          (before) =>
-            `${getNowDateWithString()}: data received\n${JSON.stringify(
-              data
-            )}\n\n${before}`
-        );
-        setLastStatus(data);
-      });
-      return () => {
-        channel.unbind("roomStatus");
-        channels.unsubscribe(roomId);
-      };
-    }
-  }, [roomId]);
+  const [voice, setVoice, voices, _]= useSpeech()
+  const [eventLog, lastStatus] = useChannel(roomId)
 
   useEffect(() => {
     if (lastStatus && voice) {
@@ -92,7 +60,6 @@ const Home = () => {
           voice={voice}
           setVoice={setVoice}
           voices={voices}
-          setVoices={setVoices}
         />
         <Hr />
         <ConditionSetting

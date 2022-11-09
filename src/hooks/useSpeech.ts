@@ -1,25 +1,32 @@
-import { useCallback, useEffect, useState } from "react";
+import { Dispatch, SetStateAction, useCallback, useEffect, useState } from "react";
 
 
-export function useSpeech() {
+export function useSpeech(): [
+  SpeechSynthesisVoice | null,
+  Dispatch<SetStateAction<SpeechSynthesisVoice | null>>,
+  SpeechSynthesisVoice[],
+  Dispatch<SetStateAction<SpeechSynthesisVoice[]>>,
+
+] {
   const [selectedVoice, setSelectedVoice] = useState<SpeechSynthesisVoice | null>(null);
   const [availableVoices, setAvailableVoices] = useState<SpeechSynthesisVoice[]>([]);
 
-  useCallback(() => {},
-   []
-  )
+  const setVoice = useCallback(() => {
+    const voices = window.speechSynthesis.getVoices()
+    setAvailableVoices(voices);
+    let defaultVoice = null
+    if (voices.length > 0) {
+      defaultVoice = window.speechSynthesis.getVoices()[0]
+    }
+    setSelectedVoice(defaultVoice)
+  }, [setAvailableVoices, setAvailableVoices])
 
   useEffect(() => {
     window.speechSynthesis.onvoiceschanged = () => {
-      setAvailableVoices(window.speechSynthesis.getVoices());
-      if (window.speechSynthesis.getVoices().length > 0) {
-        setSelectedVoice(window.speechSynthesis.getVoices()[0]);
-      }
+      setVoice()
     };
-    setAvailableVoices(window.speechSynthesis.getVoices());
-    if (window.speechSynthesis.getVoices().length > 0) {
-      setSelectedVoice(window.speechSynthesis.getVoices()[0]);
-    }
-  }, [setSelectedVoice, setAvailableVoices]);
+    setVoice
+  }, [setVoice]);
 
+  return [selectedVoice, setSelectedVoice, availableVoices, setAvailableVoices]
 }
