@@ -1,9 +1,13 @@
 import { WebClient } from '@slack/web-api';
-import formidable from 'formidable';
-import { createReadStream } from 'fs';
-import type { NextApiRequest, NextApiResponse } from 'next';
-
 import { privateConfig } from '@config';
+import { createReadStream } from 'fs';
+import type { NextApiRequest, NextApiResponse } from "next";
+import { File as FormidableFile, IncomingForm } from "formidable";
+export const config = {
+  api: {
+    bodyParser: false,
+  },
+}
 
 const web = new WebClient(privateConfig.slack.token);
 
@@ -26,7 +30,7 @@ export default async function handler(
   }
 
   await new Promise(function (resolve, reject) {
-    const form = new formidable.IncomingForm({
+    const form = new IncomingForm({
       keepExtensions: true,
       multiples: true,
       uploadDir: __dirname,
@@ -37,11 +41,12 @@ export default async function handler(
       if (err) reject({ err });
       for (const key in files) {
         if (key) {
-          const file: formidable.File = files[key] as formidable.File;
+          const file: FormidableFile = files[key] as FormidableFile;
           const filePath = file.filepath;
           const upload = await web.files.upload({
             file: createReadStream(filePath),
           });
+          console.log(upload)
           if (!upload.file) {
             console.warn('Something wrong with the uploaded file!');
             return;
@@ -51,9 +56,8 @@ export default async function handler(
       }
       resolve({ fields, files, text });
     });
-  })
-    .then((data: any) => {
-      web.chat.postMessage({ channel: privateConfig.slack.channelId, text: data.text });
+  }).then((data: any) => {
+      web.chat.postMessage({ channel:  privateConfig.slack.channelId, text: data.text });
       res.status(200).send({ message: 'ok' });
     })
     .catch((err) => {
