@@ -1,35 +1,36 @@
-import { PushStatus } from "pages";
-import { useEffect, useState } from "react";
 import Pusher from "pusher-js";
 import { publicConfig } from "@config";
-import { RoomStatus } from "./useRoomStatus";
 import { getNowDateWithString } from "@util/textToSpeech";
+import { useEffect, useState } from "react";
 
-export function useChannel(roomId: string): [string, RoomStatus|null] {
+export function useChannel<A>(channelId: string, threadId: string, receiveHandler: ((data: A) => void)|undefined=undefined): [A|null, string] {
   const [eventLog, setEventLog] = useState<string>("");
-  const [lastStatus, setLastStatus] = useState<RoomStatus | null>(null);
+  const [latest, setLatest] = useState<A | null>(null);
 
   useEffect(() => {
-    if (roomId) {
+    if (channelId) {
       const channels = new Pusher(publicConfig.pusher.key, {
         cluster: publicConfig.pusher.cluster,
       });
-      let channel = channels.subscribe(roomId);
-      channel.bind("roomStatus", (data: RoomStatus) => {
+      let channel = channels.subscribe(channelId);
+      channel.bind(threadId, (data: A) => {
+        if (receiveHandler) {
+          receiveHandler(data)
+        }
         setEventLog(
           (before) =>
             `${getNowDateWithString()}: data received\n${JSON.stringify(
               data
             )}\n\n${before}`
         );
-        setLastStatus(data);
+        setLatest(data)
       });
       return () => {
-        channel.unbind("roomStatus");
-        channels.unsubscribe(roomId);
+        channel.unbind(threadId);
+        channels.unsubscribe(channelId);
       };
     }
-  }, [roomId]);
+  }, [channelId, threadId]);
 
-  return [eventLog, lastStatus]
+  return [latest, eventLog]
 }

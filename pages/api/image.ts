@@ -2,7 +2,7 @@ import { WebClient } from '@slack/web-api';
 import { privateConfig } from '@config';
 import { createReadStream } from 'fs';
 import type { NextApiRequest, NextApiResponse } from "next";
-import { File as FormidableFile, IncomingForm } from "formidable";
+import { File as FormidableFile, IncomingForm, Fields, Files} from "formidable";
 export const config = {
   api: {
     bodyParser: false,
@@ -29,13 +29,13 @@ export default async function handler(
     res.writeHead(405).end('ChannelId must not be undefined');
   }
 
-  await new Promise(function (resolve, reject) {
+  await new Promise<{fields: Fields, files: Files, text: string|string[]}>(function (resolve, reject) {
     const form = new IncomingForm({
       keepExtensions: true,
       multiples: true,
       uploadDir: __dirname,
     });
-    form.parse(req, async (err, fields, files) => {
+    form.parse(req, async (err: Error, fields, files) => {
       const message = fields.message;
       let text = message;
       if (err) reject({ err });
@@ -46,7 +46,6 @@ export default async function handler(
           const upload = await web.files.upload({
             file: createReadStream(filePath),
           });
-          console.log(upload)
           if (!upload.file) {
             console.warn('Something wrong with the uploaded file!');
             return;
@@ -54,10 +53,17 @@ export default async function handler(
           text += `<${upload.file.permalink}| >`;
         }
       }
+      const result = { fields, files, text }
       resolve({ fields, files, text });
     });
-  }).then((data: any) => {
-      web.chat.postMessage({ channel:  privateConfig.slack.channelId, text: data.text });
+  }).then((data: {fields: Fields, files: Files, text: string|string[]}) => {
+    let message = ""
+    if (typeof data.text === "string") {
+      message = data.text
+    } else if(typeof data.text === "object") {
+      message = data.text.join(",")
+    }
+      web.chat.postMessage({ channel:  privateConfig.slack.channelId, text: message });
       res.status(200).send({ message: 'ok' });
     })
     .catch((err) => {

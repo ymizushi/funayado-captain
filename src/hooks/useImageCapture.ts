@@ -2,7 +2,7 @@ import { MutableRefObject, useEffect, useRef, useState } from "react";
 
 
 
-export function useVideo(): [ImageCapture|null, MutableRefObject<HTMLVideoElement|null>] {
+export function useImageCapture(): [ImageCapture|null, MutableRefObject<HTMLVideoElement|null>] {
   const ref = useRef<HTMLVideoElement | null>(null);
   const [imageCapture, setImageCapture] = useState<ImageCapture|null>(null)
 

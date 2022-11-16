@@ -11,6 +11,7 @@ import { Dispatch, SetStateAction } from "react";
 import { Text } from "@components/text/Text";
 import { initialRoomStatus, RoomStatus } from "@hooks/useRoomStatus";
 import { Textarea } from "@components/input/Textarea";
+import { RoomStatusMessage, RoomStatusMessageType } from "@hooks/channel/message";
 
 export type LogSettingProps = {
   pushStatus: PushStatus;
@@ -32,23 +33,28 @@ export function SystemSetting({
   eventLog,
 }: LogSettingProps) {
   const pushRoomStatus = async (roomId: string, data: RoomStatus | null) => {
-    const res = await fetch("/api/socket", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        roomId: roomId,
-        status: data,
-      }),
-    });
+    if (data) {
+      const roomStatusMessage: RoomStatusMessage = {
+        channelId: roomId,
+        threadId: "roomStatus",
+        messageType: RoomStatusMessageType,
+        payload: data
+      }
+      const res = await fetch("/api/socket", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(roomStatusMessage),
+      });
 
-    if (!res.ok) {
-      console.error("failed to push data.");
-      setPushStatus("failed");
-    } else {
-      setPushStatus("success");
-      setTimeout(() => setPushStatus(null), 2000);
+      if (!res.ok) {
+        console.error("failed to push data.");
+        setPushStatus("failed");
+      } else {
+        setPushStatus("success");
+        setTimeout(() => setPushStatus(null), 2000);
+      }
     }
   };
 

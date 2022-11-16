@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { publicConfig } from "@config";
 import { VStack } from "@components/layout/VStack";
 import { Text } from "@components/text/Text";
-import { useRoomStatus } from "@hooks/useRoomStatus";
+import { RoomStatus, useRoomStatus } from "@hooks/useRoomStatus";
 import { speak } from "@util/textToSpeech";
 import { Header } from "@components/pages/Header";
 import { Hr } from "@components/decoration/Hr";
@@ -24,7 +24,7 @@ const Home = () => {
   const [pushStatus, setPushStatus] = useState<PushStatus>(null);
 
   const [voice, setVoice, voices, _]= useSpeech()
-  const [eventLog, lastStatus] = useChannel(roomId)
+  const [lastStatus, eventLog] = useChannel<RoomStatus>(roomId, "roomStatus")
 
   useEffect(() => {
     if (lastStatus && voice) {
