@@ -12,6 +12,7 @@ import { SystemSetting } from "./setting/SystemSetting";
 import { VideoSetting } from "./setting/VideoSetting";
 import { useSpeech } from "@hooks/useSpeech";
 import { useChannel } from "@hooks/useChannel";
+import { RoomStatusMessageType } from "@hooks/channel/message";
 
 const config = publicConfig;
 
@@ -24,28 +25,28 @@ const Home = () => {
   const [pushStatus, setPushStatus] = useState<PushStatus>(null);
 
   const [voice, setVoice, voices, _]= useSpeech()
-  const [lastStatus, eventLog] = useChannel<RoomStatus>(roomId, "roomStatus")
+  const [lastRoomStatus, roomStatusEventLog, roomStatusNotifier] = useChannel<RoomStatus>(roomId, "roomStatus", RoomStatusMessageType)
 
   useEffect(() => {
-    if (lastStatus && voice) {
-      let sentence = `水深は${lastStatus.waterDepth.toString()}メートル。`;
-      if (lastStatus.tana) {
-        sentence = sentence + `タナは${lastStatus.tana}メートル。`;
+    if (lastRoomStatus && voice) {
+      let sentence = `水深は${lastRoomStatus.waterDepth.toString()}メートル。`;
+      if (lastRoomStatus.tana) {
+        sentence = sentence + `タナは${lastRoomStatus.tana}メートル。`;
       }
-      if (lastStatus.size) {
-        sentence = sentence + `おおきさは${lastStatus.size}。`;
+      if (lastRoomStatus.size) {
+        sentence = sentence + `おおきさは${lastRoomStatus.size}。`;
       }
-      if (lastStatus.amount) {
-        sentence = sentence + `かずは${lastStatus.amount}。`;
+      if (lastRoomStatus.amount) {
+        sentence = sentence + `かずは${lastRoomStatus.amount}。`;
       }
-      if (lastStatus.bottomMaterial) {
-        sentence = sentence + `ていしつは、${lastStatus.bottomMaterial}。`;
+      if (lastRoomStatus.bottomMaterial) {
+        sentence = sentence + `ていしつは、${lastRoomStatus.bottomMaterial}。`;
       }
       speak(sentence, voice);
     }
     // voiceが変わったとしても再実行させたくないので、dependency list には含めない
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [lastStatus]);
+  }, [lastRoomStatus]);
 
   return (
     <>
@@ -73,12 +74,14 @@ const Home = () => {
           setPushStatus={setPushStatus}
           isParent={isParent}
           roomStatus={roomStatus}
-          roomId={roomId}
           setRoomStatus={setRoomStatus}
-          eventLog={eventLog}
+          eventLog={roomStatusEventLog}
+          roomStatusNotifier={roomStatusNotifier}
         />
         <Hr />
-        <VideoSetting />
+        <VideoSetting 
+          isParent={isParent}
+        />
       </VStack>
     </>
   );

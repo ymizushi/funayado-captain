@@ -19,8 +19,8 @@ export type LogSettingProps = {
   isParent: boolean;
   roomStatus: RoomStatus;
   setRoomStatus: (status: RoomStatus) => void;
-  roomId: string;
   eventLog: string;
+  roomStatusNotifier: (data: RoomStatus) => Promise<Response>
 };
 
 export function SystemSetting({
@@ -29,25 +29,12 @@ export function SystemSetting({
   isParent,
   roomStatus,
   setRoomStatus,
-  roomId,
   eventLog,
+  roomStatusNotifier
 }: LogSettingProps) {
-  const pushRoomStatus = async (roomId: string, data: RoomStatus | null) => {
+  const pushRoomStatus = async (data: RoomStatus | null) => {
     if (data) {
-      const roomStatusMessage: RoomStatusMessage = {
-        channelId: roomId,
-        threadId: "roomStatus",
-        messageType: RoomStatusMessageType,
-        payload: data
-      }
-      const res = await fetch("/api/socket", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(roomStatusMessage),
-      });
-
+      const res = await roomStatusNotifier(data)
       if (!res.ok) {
         console.error("failed to push data.");
         setPushStatus("failed");
@@ -74,7 +61,7 @@ export function SystemSetting({
               disabled={!isParent}
               onClick={async () => {
                 if (roomStatus) {
-                  await pushRoomStatus(roomId, roomStatus);
+                  await pushRoomStatus(roomStatus);
                 }
               }}
             >

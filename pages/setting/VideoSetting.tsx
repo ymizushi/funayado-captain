@@ -2,28 +2,28 @@ import { Button } from "@components/input/Button";
 import { VStackChildren } from "@components/layout/VStack";
 import { Text } from "@components/text/Text";
 import { useImageCapture } from "@hooks/useImageCapture";
-import { MutableRefObject, useEffect, useRef, useState } from "react";
-import { WebClient } from "@slack/web-api";
+import { useEffect, useRef, useState } from "react";
 import { useChannel } from "@hooks/useChannel";
-import { CaptureMessage, CaptureMessageType } from "@hooks/channel/message";
+import { CaptureMessage, CaptureMessageType, CapturePayload } from "@hooks/channel/message";
 
-export type VideoSettingProps = {};
+export type VideoSettingProps = {isParent: boolean};
 
-export function VideoSetting({ }: VideoSettingProps) {
+export function VideoSetting({
+  isParent
+ }: VideoSettingProps) {
   const [imageCapture, ref] = useImageCapture()
   return (
     <>
       <VStackChildren>
         <video ref={ref} autoPlay></video>
-        <ScreenShot id="screenshot" imageCapture={imageCapture} />
+        <ScreenShot id="screenshot" imageCapture={imageCapture}  isParent={isParent} />
       </VStackChildren>
     </>
   );
 }
 
-export function ScreenShot({ id, imageCapture }: { id: string, imageCapture: ImageCapture | null }) {
-  const roomId = "default-room"
-  const [latest, eventLog] = useChannel<CaptureMessage>(roomId, "capture")
+export function ScreenShot({ id, imageCapture, isParent }: { id: string, imageCapture: ImageCapture | null, isParent: boolean }) {
+  const [latest, eventLog, notifier] = useChannel<CapturePayload>("capture", "capture", CaptureMessageType)
   const ref = useRef<HTMLCanvasElement|null>(null)
   const canvas = ref.current
   const [blob, setBlob] = useState<Blob|null>(null)
@@ -74,21 +74,10 @@ export function ScreenShot({ id, imageCapture }: { id: string, imageCapture: Ima
     </Button>
 
     <Button
+      disabled={isParent}
       onClick={async () => {
-        const body: CaptureMessage = {
-          channelId: roomId,
-          threadId: "capture",
-          messageType: CaptureMessageType,
-          payload: {}
-        }
-        const res = await fetch("/api/socket", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(body),
-        });
-
+        
+        const res = await notifier({})
         if (!res.ok) {
           console.error("failed to push data.");
         } else {
