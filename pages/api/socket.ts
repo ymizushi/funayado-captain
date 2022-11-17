@@ -14,14 +14,14 @@ const channels = new Channels({
 
 const SocketHandler = async (req: NextApiRequest, res: NextApiResponse) => {
   if (channels) {
-    const data = req.body;
-    if (isRoomStatusMessage(data) || isCaptureMessage(data)) {
-      await channels.trigger(data.channelId, data.threadId, data.payload);
+    const message = req.body;
+    if (isRoomStatusMessage(message) || isCaptureMessage(message)) {
+      await channels.trigger(message.channelId, message.messageType, message.payload);
       res.status(200).json({ status: "ok" });
     } else {
       res.status(400).json({
         status: "ng",
-        message: `${JSON.stringify(data)}$ is invalid request body}`,
+        message: `${JSON.stringify(message)}$ is invalid request body}`,
       });
     }
   } else {

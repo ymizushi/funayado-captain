@@ -3,12 +3,11 @@ import { VStackChildren } from "@components/layout/VStack";
 import { Text } from "@components/text/Text";
 import { useImageCapture } from "@hooks/useImageCapture";
 import { useEffect, useRef, useState } from "react";
-import { useChannel } from "@hooks/useChannel";
+import { useChannel } from "@hooks/channel/useChannel";
 import { CaptureMessageType, CapturePayload } from "@hooks/channel/message";
+import { defaultChannelId } from "@hooks/channel/channel";
 
-export type VideoSettingProps = { isParent: boolean };
-
-export function VideoSetting({ isParent }: VideoSettingProps) {
+export function VideoSetting() {
   const [imageCapture, ref] = useImageCapture();
   return (
     <>
@@ -17,7 +16,6 @@ export function VideoSetting({ isParent }: VideoSettingProps) {
         <ScreenShot
           id="screenshot"
           imageCapture={imageCapture}
-          isParent={isParent}
         />
       </VStackChildren>
     </>
@@ -27,79 +25,64 @@ export function VideoSetting({ isParent }: VideoSettingProps) {
 export function ScreenShot({
   id,
   imageCapture,
-  isParent,
 }: {
   id: string;
   imageCapture: ImageCapture | null;
-  isParent: boolean;
 }) {
-  const [latest, eventLog, notifier] = useChannel<CapturePayload>(
-    "capture",
-    "capture",
+  const [captureEvent, capturedEventLog, notifyCaptureEvent] = useChannel<CapturePayload>(
+    defaultChannelId,
     CaptureMessageType
   );
   const ref = useRef<HTMLCanvasElement | null>(null);
   const canvas = ref.current;
   const [blob, setBlob] = useState<Blob | null>(null);
 
-  const capture = async () => {
-    imageCapture
-      ?.grabFrame()
-      .then((imageBitmap) => {
-        if (canvas) {
-          canvas.width = imageBitmap.width;
-          canvas.height = imageBitmap.height;
-          canvas.getContext("2d")?.drawImage(imageBitmap, 0, 0);
-          canvas.toBlob((b) => {
-            if (b) {
-              setBlob(b);
-            }
-          });
+  const capture = async (): Promise<void>  =>  {
+    const imageBitmap = await imageCapture?.grabFrame()
+    if (canvas && imageBitmap) {
+      canvas.width = imageBitmap.width;
+      canvas.height = imageBitmap.height;
+      canvas.getContext("2d")?.drawImage(imageBitmap, 0, 0);
+      canvas.toBlob((b) => {
+        if (b) {
+          setBlob(b);
         }
-        return null;
-      })
-      .catch((error) => console.log(error));
+      });
+    }
   };
-  const upload = async () => {
-    if (blob) {
+  const upload = async (blob: Blob): Promise<void> => {
       const formData = new FormData();
       formData.append("file", blob);
       await fetch("/api/image", {
         method: "POST",
         body: formData,
       });
-    }
-  };
+  }
 
   useEffect(() => {
-    if (latest) {
-      capture();
-      console.log("captured!!");
+    if (captureEvent) {
+      capture()
     }
-  }, [latest]);
+  }, [captureEvent]);
+
+  useEffect(() => {
+    if (blob) {
+      upload(blob)
+    }
+  }, [blob]);
 
   return (
     <>
       <canvas id={id} ref={ref} />
-      <Button onClick={capture}>
-        <Text>キャプチャー</Text>
-      </Button>
-
       <Button
-        disabled={isParent}
         onClick={async () => {
-          const res = await notifier({});
+          const res = await notifyCaptureEvent({});
           if (!res.ok) {
             console.error("failed to push data.");
-          } else {
-          }
+          } 
         }}
       >
-        <Text>ポスト</Text>
-      </Button>
-
-      <Button onClick={upload}>
-        <Text>アップロード</Text>
+        <Text>キャプチャー&アップロード依頼</Text>
       </Button>
     </>
   );

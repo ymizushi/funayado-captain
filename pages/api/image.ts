@@ -22,15 +22,11 @@ export default async function handler(
 ) {
   if (req.method !== "POST") {
     res.status(405).send({ message: "Only POST requests allowed" });
-    return;
   }
   if (!privateConfig.slack.token) {
-    console.warn("Token must not be undefined");
     res.writeHead(405).end("Token must not be undefined");
   }
-
   if (!privateConfig.slack.channelId) {
-    console.warn("ChannelId must not be undefined");
     res.writeHead(405).end("ChannelId must not be undefined");
   }
 
@@ -42,8 +38,7 @@ export default async function handler(
         uploadDir: __dirname,
       });
       form.parse(req, async (err: Error, fields, files) => {
-        const message = fields.message;
-        let text = message;
+        let text = fields.message;
         if (err) reject({ err });
         for (const key in files) {
           if (key) {

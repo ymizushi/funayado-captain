@@ -11,22 +11,23 @@ import { ConditionSetting } from "./setting/ConditionSetting";
 import { SystemSetting } from "./setting/SystemSetting";
 import { VideoSetting } from "./setting/VideoSetting";
 import { useSpeech } from "@hooks/useSpeech";
-import { useChannel } from "@hooks/useChannel";
+import { useChannel } from "@hooks/channel/useChannel";
 import { RoomStatusMessageType } from "@hooks/channel/message";
+import { defaultChannelId } from "@hooks/channel/channel";
 
 const config = publicConfig;
 
 export type PushStatus = "success" | "failed" | null;
 
 const Home = () => {
-  const [roomId, setRoomId] = useState<string>("default-room");
-  const [roomStatus, setRoomStatus] = useRoomStatus(roomId);
+  const [channelId, setChannelId] = useState<string>(defaultChannelId);
+  const [roomStatus, setRoomStatus] = useRoomStatus(channelId);
   const [isParent, setIsParent] = useState(false);
   const [pushStatus, setPushStatus] = useState<PushStatus>(null);
 
   const [voice, setVoice, voices, _] = useSpeech();
   const [lastRoomStatus, roomStatusEventLog, roomStatusNotifier] =
-    useChannel<RoomStatus>(roomId, "roomStatus", RoomStatusMessageType);
+    useChannel<RoomStatus>(channelId, RoomStatusMessageType);
 
   useEffect(() => {
     if (lastRoomStatus && voice) {
@@ -57,8 +58,8 @@ const Home = () => {
       <VStack>
         <MemberSetting
           setIsParent={setIsParent}
-          roomId={roomId}
-          setRoomId={setRoomId}
+          roomId={channelId}
+          setRoomId={setChannelId}
           voice={voice}
           setVoice={setVoice}
           voices={voices}
@@ -80,7 +81,7 @@ const Home = () => {
           roomStatusNotifier={roomStatusNotifier}
         />
         <Hr />
-        <VideoSetting isParent={isParent} />
+        <VideoSetting />
       </VStack>
     </>
   );

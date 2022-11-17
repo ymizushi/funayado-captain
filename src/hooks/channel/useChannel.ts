@@ -2,46 +2,43 @@ import Pusher from "pusher-js";
 import { publicConfig } from "@config";
 import { getNowDateWithString } from "@util/textToSpeech";
 import { useEffect, useState } from "react";
-import { Message, MessageType } from "./channel/message";
+import { Message, MessageType } from "./message";
+
+const channels = new Pusher(publicConfig.pusher.key, {
+  cluster: publicConfig.pusher.cluster,
+});
 
 export function useChannel<A>(
   channelId: string,
-  threadId: string,
   messageType: MessageType,
   receiveHandler: ((data: A) => void) | undefined = undefined
-): [A | null, string, (data: A) => Promise<Response>] {
+): [A | null, string, (payload: A) => Promise<Response>] {
   const [eventLog, setEventLog] = useState<string>("");
   const [latest, setLatest] = useState<A | null>(null);
 
   useEffect(() => {
-    const channels = new Pusher(publicConfig.pusher.key, {
-      cluster: publicConfig.pusher.cluster,
-    });
     let channel = channels.subscribe(channelId);
-    console.log(channel);
-    channel.bind(threadId, (data: A) => {
-      console.log("data is received");
+    channel.bind(messageType, (payload: A) => {
       if (receiveHandler) {
-        receiveHandler(data);
+        receiveHandler(payload);
       }
+      setLatest(payload);
       setEventLog(
         (before) =>
           `${getNowDateWithString()}: data received\n${JSON.stringify(
-            data
+            payload
           )}\n\n${before}`
       );
-      setLatest(data);
     });
     return () => {
-      channel.unbind(threadId);
+      channel.unbind(messageType);
       channels.unsubscribe(channelId);
     };
-  }, [channelId, threadId, messageType]);
+  }, [channelId, messageType]);
 
   const notifier = async function (data: A): Promise<Response> {
     const message: Message<typeof messageType, A> = {
       channelId: channelId,
-      threadId: threadId,
       messageType: messageType,
       payload: data,
     };

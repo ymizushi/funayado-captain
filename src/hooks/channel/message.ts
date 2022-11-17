@@ -3,7 +3,6 @@ export const CaptureMessageType = "capture" as const;
 
 export type Message<A extends MessageType, B> = {
   channelId: string;
-  threadId: string;
   messageType: A;
   payload: B;
 };
