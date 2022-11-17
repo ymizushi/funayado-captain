@@ -1,10 +1,11 @@
 import { MutableRefObject, useEffect, useRef, useState } from "react";
 
-
-
-export function useImageCapture(): [ImageCapture|null, MutableRefObject<HTMLVideoElement|null>] {
+export function useImageCapture(): [
+  ImageCapture | null,
+  MutableRefObject<HTMLVideoElement | null>
+] {
   const ref = useRef<HTMLVideoElement | null>(null);
-  const [imageCapture, setImageCapture] = useState<ImageCapture|null>(null)
+  const [imageCapture, setImageCapture] = useState<ImageCapture | null>(null);
 
   useEffect(() => {
     navigator.mediaDevices
@@ -22,5 +23,5 @@ export function useImageCapture(): [ImageCapture|null, MutableRefObject<HTMLVide
       .catch((error) => console.log(`imageCapture failed: ${error}`));
   }, [setImageCapture]);
 
-  return [imageCapture, ref]
+  return [imageCapture, ref];
 }

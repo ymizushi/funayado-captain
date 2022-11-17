@@ -19,15 +19,15 @@ const SocketHandler = async (req: NextApiRequest, res: NextApiResponse) => {
       await channels.trigger(data.channelId, data.threadId, data.payload);
       res.status(200).json({ status: "ok" });
     } else {
-      res.status(400).json(
-        {
-          status: "ng",
-          message: `${JSON.stringify(data)}$ is invalid request body}`
-        }
-      );
+      res.status(400).json({
+        status: "ng",
+        message: `${JSON.stringify(data)}$ is invalid request body}`,
+      });
     }
   } else {
-    res.status(500).json({ status: "ng", message: "channel config is invalid"});
+    res
+      .status(500)
+      .json({ status: "ng", message: "channel config is invalid" });
   }
 };
 

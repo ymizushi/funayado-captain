@@ -24,8 +24,9 @@ const Home = () => {
   const [isParent, setIsParent] = useState(false);
   const [pushStatus, setPushStatus] = useState<PushStatus>(null);
 
-  const [voice, setVoice, voices, _]= useSpeech()
-  const [lastRoomStatus, roomStatusEventLog, roomStatusNotifier] = useChannel<RoomStatus>(roomId, "roomStatus", RoomStatusMessageType)
+  const [voice, setVoice, voices, _] = useSpeech();
+  const [lastRoomStatus, roomStatusEventLog, roomStatusNotifier] =
+    useChannel<RoomStatus>(roomId, "roomStatus", RoomStatusMessageType);
 
   useEffect(() => {
     if (lastRoomStatus && voice) {
@@ -79,9 +80,7 @@ const Home = () => {
           roomStatusNotifier={roomStatusNotifier}
         />
         <Hr />
-        <VideoSetting 
-          isParent={isParent}
-        />
+        <VideoSetting isParent={isParent} />
       </VStack>
     </>
   );

@@ -11,7 +11,10 @@ import { Dispatch, SetStateAction } from "react";
 import { Text } from "@components/text/Text";
 import { initialRoomStatus, RoomStatus } from "@hooks/useRoomStatus";
 import { Textarea } from "@components/input/Textarea";
-import { RoomStatusMessage, RoomStatusMessageType } from "@hooks/channel/message";
+import {
+  RoomStatusMessage,
+  RoomStatusMessageType,
+} from "@hooks/channel/message";
 
 export type LogSettingProps = {
   pushStatus: PushStatus;
@@ -20,7 +23,7 @@ export type LogSettingProps = {
   roomStatus: RoomStatus;
   setRoomStatus: (status: RoomStatus) => void;
   eventLog: string;
-  roomStatusNotifier: (data: RoomStatus) => Promise<Response>
+  roomStatusNotifier: (data: RoomStatus) => Promise<Response>;
 };
 
 export function SystemSetting({
@@ -30,11 +33,11 @@ export function SystemSetting({
   roomStatus,
   setRoomStatus,
   eventLog,
-  roomStatusNotifier
+  roomStatusNotifier,
 }: LogSettingProps) {
   const pushRoomStatus = async (data: RoomStatus | null) => {
     if (data) {
-      const res = await roomStatusNotifier(data)
+      const res = await roomStatusNotifier(data);
       if (!res.ok) {
         console.error("failed to push data.");
         setPushStatus("failed");

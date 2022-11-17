@@ -4,7 +4,12 @@ import { getNowDateWithString } from "@util/textToSpeech";
 import { useEffect, useState } from "react";
 import { Message, MessageType } from "./channel/message";
 
-export function useChannel<A>(channelId: string, threadId: string, messageType: MessageType, receiveHandler: ((data: A) => void)|undefined=undefined): [A|null, string, (data: A) => Promise<Response>] {
+export function useChannel<A>(
+  channelId: string,
+  threadId: string,
+  messageType: MessageType,
+  receiveHandler: ((data: A) => void) | undefined = undefined
+): [A | null, string, (data: A) => Promise<Response>] {
   const [eventLog, setEventLog] = useState<string>("");
   const [latest, setLatest] = useState<A | null>(null);
 
@@ -13,11 +18,11 @@ export function useChannel<A>(channelId: string, threadId: string, messageType: 
       cluster: publicConfig.pusher.cluster,
     });
     let channel = channels.subscribe(channelId);
-    console.log(channel)
+    console.log(channel);
     channel.bind(threadId, (data: A) => {
-      console.log("data is received")
+      console.log("data is received");
       if (receiveHandler) {
-        receiveHandler(data)
+        receiveHandler(data);
       }
       setEventLog(
         (before) =>
@@ -25,7 +30,7 @@ export function useChannel<A>(channelId: string, threadId: string, messageType: 
             data
           )}\n\n${before}`
       );
-      setLatest(data)
+      setLatest(data);
     });
     return () => {
       channel.unbind(threadId);
@@ -38,8 +43,8 @@ export function useChannel<A>(channelId: string, threadId: string, messageType: 
       channelId: channelId,
       threadId: threadId,
       messageType: messageType,
-      payload: data
-    }
+      payload: data,
+    };
     return await fetch("/api/socket", {
       method: "POST",
       headers: {
@@ -47,7 +52,7 @@ export function useChannel<A>(channelId: string, threadId: string, messageType: 
       },
       body: JSON.stringify(message),
     });
-  }
+  };
 
-  return [latest, eventLog, notifier]
+  return [latest, eventLog, notifier];
 }
