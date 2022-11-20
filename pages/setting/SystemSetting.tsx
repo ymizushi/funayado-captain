@@ -11,22 +11,18 @@ import { Dispatch, SetStateAction } from "react";
 import { Text } from "@components/text/Text";
 import { initialRoomStatus, RoomStatus } from "@hooks/useRoomStatus";
 import { Textarea } from "@components/input/Textarea";
-import {
-  RoomStatusMessage,
-  RoomStatusMessageType,
-} from "@hooks/channel/message";
 
 export type LogSettingProps = {
   pushStatus: PushStatus;
   setPushStatus: Dispatch<SetStateAction<PushStatus>>;
   isParent: boolean;
-  roomStatus: RoomStatus;
-  setRoomStatus: (status: RoomStatus) => void;
+  roomStatus: RoomStatus | null;
+  setRoomStatus: (status: RoomStatus | null) => void;
   eventLog: string;
   roomStatusNotifier: (data: RoomStatus) => Promise<Response>;
 };
 
-export function SystemSetting({
+export default function SystemSetting({
   pushStatus,
   setPushStatus,
   isParent,

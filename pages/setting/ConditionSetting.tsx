@@ -5,19 +5,18 @@ import {
   SecondColumn,
 } from "@components/layout/TwoColumnComponent";
 import { VStackChildren } from "@components/layout/VStack";
-import { Dispatch, SetStateAction } from "react";
 import { Component } from "@components/basic/Component";
 import { Text } from "@components/text/Text";
 import { VerticalRangeSlider } from "@components/input/Slider";
 import { RoomStatus } from "@hooks/useRoomStatus";
 
 type ConditionSettingProps = {
-  roomStatus: RoomStatus;
-  setRoomStatus: (value: RoomStatus) => void;
+  roomStatus: RoomStatus | null;
+  setRoomStatus: (value: RoomStatus | null) => void;
   isParent: boolean;
 };
 
-export function ConditionSetting({
+export default function ConditionSetting({
   roomStatus,
   setRoomStatus,
   isParent,
@@ -30,19 +29,21 @@ export function ConditionSetting({
             <Text>すいしん</Text>
           </FirstColumn>
           <SecondColumn>
-            <Text>{roomStatus.waterDepth}m</Text>
+            <Text>{roomStatus?.waterDepth}m</Text>
           </SecondColumn>
         </TwoColumnComponent>
         <Component>
           <VerticalRangeSlider
             disabled={!isParent}
-            value={roomStatus.waterDepth}
+            value={roomStatus?.waterDepth ?? 0}
             onChange={(n: number) => {
-              const newStatus = {
-                ...roomStatus,
-                waterDepth: n,
-              };
-              setRoomStatus(newStatus);
+              if (roomStatus) {
+                const newStatus: RoomStatus = {
+                  ...roomStatus,
+                  waterDepth: n,
+                };
+                setRoomStatus(newStatus);
+              }
             }}
             min={0}
             max={100}
@@ -55,19 +56,21 @@ export function ConditionSetting({
             <Text>たな</Text>
           </FirstColumn>
           <SecondColumn>
-            <Text>{roomStatus.tana ?? "??"}m</Text>
+            <Text>{roomStatus?.tana ?? "??"}m</Text>
           </SecondColumn>
         </TwoColumnComponent>
         <Component>
           <VerticalRangeSlider
             disabled={!isParent}
-            value={roomStatus.tana ?? 0}
+            value={roomStatus?.tana ?? 0}
             onChange={(n: number) => {
-              const newStatus = {
-                ...roomStatus,
-                tana: n,
-              };
-              setRoomStatus(newStatus);
+              if (roomStatus) {
+                const newStatus = {
+                  ...roomStatus,
+                  tana: n,
+                };
+                setRoomStatus(newStatus);
+              }
             }}
             min={0}
             max={100}
@@ -90,11 +93,13 @@ export function ConditionSetting({
                 value: v,
               }))}
               onChange={(value: KV<string>) => {
-                const newStatus = {
-                  ...roomStatus,
-                  size: value.value,
-                };
-                setRoomStatus(newStatus);
+                if (roomStatus) {
+                  const newStatus = {
+                    ...roomStatus,
+                    size: value.value,
+                  };
+                  setRoomStatus(newStatus);
+                }
               }}
             />
           </SecondColumn>
@@ -116,11 +121,13 @@ export function ConditionSetting({
                 value: v,
               }))}
               onChange={(value: KV<string>) => {
-                const newStatus = {
-                  ...roomStatus,
-                  amount: value.value,
-                };
-                setRoomStatus(newStatus);
+                if (roomStatus) {
+                  const newStatus = {
+                    ...roomStatus,
+                    amount: value.value,
+                  };
+                  setRoomStatus(newStatus);
+                }
               }}
             />
           </SecondColumn>
@@ -142,11 +149,13 @@ export function ConditionSetting({
                 value: v,
               }))}
               onChange={(value: KV<string>) => {
-                const newStatus = {
-                  ...roomStatus,
-                  bottomMaterial: value.value,
-                };
-                setRoomStatus(newStatus);
+                if (roomStatus) {
+                  const newStatus = {
+                    ...roomStatus,
+                    bottomMaterial: value.value,
+                  };
+                  setRoomStatus(newStatus);
+                }
               }}
             />
           </SecondColumn>

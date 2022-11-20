@@ -7,16 +7,13 @@ import { useChannel } from "@hooks/channel/useChannel";
 import { CaptureMessageType, CapturePayload } from "@hooks/channel/message";
 import { defaultChannelId } from "@hooks/channel/channel";
 
-export function VideoSetting() {
+export default function VideoSetting() {
   const [imageCapture, ref] = useImageCapture();
   return (
     <>
       <VStackChildren>
         <video ref={ref} autoPlay></video>
-        <ScreenShot
-          id="screenshot"
-          imageCapture={imageCapture}
-        />
+        <ScreenShot id="screenshot" imageCapture={imageCapture} />
       </VStackChildren>
     </>
   );
@@ -29,16 +26,14 @@ export function ScreenShot({
   id: string;
   imageCapture: ImageCapture | null;
 }) {
-  const [captureEvent, capturedEventLog, notifyCaptureEvent] = useChannel<CapturePayload>(
-    defaultChannelId,
-    CaptureMessageType
-  );
+  const [captureEvent, capturedEventLog, notifyCaptureEvent] =
+    useChannel<CapturePayload>(defaultChannelId, CaptureMessageType);
   const ref = useRef<HTMLCanvasElement | null>(null);
   const canvas = ref.current;
   const [blob, setBlob] = useState<Blob | null>(null);
 
-  const capture = useCallback(async (): Promise<void>  =>  {
-    const imageBitmap = await imageCapture?.grabFrame()
+  const capture = useCallback(async (): Promise<void> => {
+    const imageBitmap = await imageCapture?.grabFrame();
     if (canvas && imageBitmap) {
       canvas.width = imageBitmap.width;
       canvas.height = imageBitmap.height;
@@ -51,23 +46,23 @@ export function ScreenShot({
     }
   }, [imageCapture, canvas]);
   const upload = async (blob: Blob): Promise<void> => {
-      const formData = new FormData();
-      formData.append("file", blob);
-      await fetch("/api/image", {
-        method: "POST",
-        body: formData,
-      });
-  }
+    const formData = new FormData();
+    formData.append("file", blob);
+    await fetch("/api/image", {
+      method: "POST",
+      body: formData,
+    });
+  };
 
   useEffect(() => {
     if (captureEvent) {
-      capture()
+      capture();
     }
   }, [captureEvent, capture]);
 
   useEffect(() => {
     if (blob) {
-      upload(blob)
+      upload(blob);
     }
   }, [blob]);
 
@@ -79,7 +74,7 @@ export function ScreenShot({
           const res = await notifyCaptureEvent({});
           if (!res.ok) {
             console.error("failed to push data.");
-          } 
+          }
         }}
       >
         <Text>キャプチャー&アップロード依頼</Text>

@@ -16,7 +16,11 @@ const SocketHandler = async (req: NextApiRequest, res: NextApiResponse) => {
   if (channels) {
     const message = req.body;
     if (isRoomStatusMessage(message) || isCaptureMessage(message)) {
-      await channels.trigger(message.channelId, message.messageType, message.payload);
+      await channels.trigger(
+        message.channelId,
+        message.messageType,
+        message.payload
+      );
       res.status(200).json({ status: "ok" });
     } else {
       res.status(400).json({

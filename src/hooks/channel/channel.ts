@@ -1,1 +1,1 @@
-export const defaultChannelId = "default-channel" as const
+export const defaultChannelId = "default-channel" as const;

@@ -21,13 +21,13 @@ type MemberSettingProps = {
   voices: SpeechSynthesisVoice[];
 };
 
-export function MemberSetting({
+export default function MemberSetting({
   setIsParent,
   roomId,
   setRoomId,
   voice,
   setVoice,
-  voices,
+  voices = [],
 }: MemberSettingProps) {
   return (
     <>
