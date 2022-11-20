@@ -10,6 +10,10 @@ type PrivateConfig = {
     appId: string;
     secret: string;
   };
+  slack: {
+    token: string;
+    channelId: string;
+  };
 };
 
 export const publicConfig: PublicConfig = {
@@ -23,5 +27,9 @@ export const privateConfig: PrivateConfig = {
   pusher: {
     appId: process.env.PUSHER_APP_ID ?? "",
     secret: process.env.PUSHER_SECRET ?? "",
+  },
+  slack: {
+    token: process.env.SLACK_TOKEN ?? "",
+    channelId: process.env.SLACK_CHANNEL_ID ?? "",
   },
 };
