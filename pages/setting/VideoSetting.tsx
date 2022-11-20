@@ -2,7 +2,7 @@ import { Button } from "@components/input/Button";
 import { VStackChildren } from "@components/layout/VStack";
 import { Text } from "@components/text/Text";
 import { useImageCapture } from "@hooks/useImageCapture";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useChannel } from "@hooks/channel/useChannel";
 import { CaptureMessageType, CapturePayload } from "@hooks/channel/message";
 import { defaultChannelId } from "@hooks/channel/channel";
@@ -37,7 +37,7 @@ export function ScreenShot({
   const canvas = ref.current;
   const [blob, setBlob] = useState<Blob | null>(null);
 
-  const capture = async (): Promise<void>  =>  {
+  const capture = useCallback(async (): Promise<void>  =>  {
     const imageBitmap = await imageCapture?.grabFrame()
     if (canvas && imageBitmap) {
       canvas.width = imageBitmap.width;
@@ -49,7 +49,7 @@ export function ScreenShot({
         }
       });
     }
-  };
+  }, [imageCapture, canvas]);
   const upload = async (blob: Blob): Promise<void> => {
       const formData = new FormData();
       formData.append("file", blob);
@@ -63,7 +63,7 @@ export function ScreenShot({
     if (captureEvent) {
       capture()
     }
-  }, [captureEvent]);
+  }, [captureEvent, capture]);
 
   useEffect(() => {
     if (blob) {

@@ -26,7 +26,7 @@ export function useSpeech(): [
       defaultVoice = window.speechSynthesis.getVoices()[0];
     }
     setSelectedVoice(defaultVoice);
-  }, [setAvailableVoices, setAvailableVoices]);
+  }, [setAvailableVoices]);
 
   useEffect(() => {
     window.speechSynthesis.onvoiceschanged = () => {

@@ -34,7 +34,7 @@ export function useChannel<A>(
       channel.unbind(messageType);
       channels.unsubscribe(channelId);
     };
-  }, [channelId, messageType]);
+  }, [channelId, messageType, receiveHandler]);
 
   const notifier = async function (data: A): Promise<Response> {
     const message: Message<typeof messageType, A> = {
