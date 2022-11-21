@@ -9,8 +9,7 @@ export const speak: (
   window.speechSynthesis.speak(utter);
 };
 
-export function getNowDateWithString() {
-  const dt = new Date();
+export function getNowDateWithString(dt: Date=new Date()) {
   const y = dt.getFullYear();
   const m = ("00" + (dt.getMonth() + 1)).slice(-2);
   const d = ("00" + dt.getDate()).slice(-2);

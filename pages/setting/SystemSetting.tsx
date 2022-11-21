@@ -1,16 +1,16 @@
-import { Component } from "@components/basic/Component";
-import { Button } from "@components/input/Button";
+import { Component } from "@/components/basic/Component";
+import { Button } from "@/components/input/Button";
 import {
   FirstColumn,
   SecondColumn,
   TwoColumnComponent,
-} from "@components/layout/TwoColumnComponent";
-import { VStackChildren } from "@components/layout/VStack";
+} from "@/components/layout/TwoColumnComponent";
+import { VStackChildren } from "@/components/layout/VStack";
 import { PushStatus } from "pages";
 import { Dispatch, SetStateAction } from "react";
-import { Text } from "@components/text/Text";
-import { initialRoomStatus, RoomStatus } from "@hooks/useRoomStatus";
-import { Textarea } from "@components/input/Textarea";
+import { Text } from "@/components/text/Text";
+import { initialRoomStatus, RoomStatus } from "@/hooks/useRoomStatus";
+import { Textarea } from "@/components/input/Textarea";
 
 export type LogSettingProps = {
   pushStatus: PushStatus;

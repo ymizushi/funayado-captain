@@ -1,6 +1,6 @@
 import Pusher from "pusher-js";
-import { publicConfig } from "@config";
-import { getNowDateWithString } from "@util/textToSpeech";
+import { publicConfig } from "@/config";
+import { getNowDateWithString } from "@/util/textToSpeech";
 import { useEffect, useState } from "react";
 import { Message, MessageType } from "./message";
 

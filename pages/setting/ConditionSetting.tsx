@@ -1,14 +1,14 @@
-import { Select, KV } from "@components/input/Select";
+import { Select, KV } from "@/components/input/Select";
 import {
   TwoColumnComponent,
   FirstColumn,
   SecondColumn,
-} from "@components/layout/TwoColumnComponent";
-import { VStackChildren } from "@components/layout/VStack";
-import { Component } from "@components/basic/Component";
-import { Text } from "@components/text/Text";
-import { VerticalRangeSlider } from "@components/input/Slider";
-import { RoomStatus } from "@hooks/useRoomStatus";
+} from "@/components/layout/TwoColumnComponent";
+import { VStackChildren } from "@/components/layout/VStack";
+import { Component } from "@/components/basic/Component";
+import { Text } from "@/components/text/Text";
+import { VerticalRangeSlider } from "@/components/input/Slider";
+import { RoomStatus } from "@/hooks/useRoomStatus";
 
 type ConditionSettingProps = {
   roomStatus: RoomStatus | null;

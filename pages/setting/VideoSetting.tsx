@@ -1,11 +1,11 @@
-import { Button } from "@components/input/Button";
-import { VStackChildren } from "@components/layout/VStack";
-import { Text } from "@components/text/Text";
-import { useImageCapture } from "@hooks/useImageCapture";
+import { Button } from "@/components/input/Button";
+import { VStackChildren } from "@/components/layout/VStack";
+import { Text } from "@/components/text/Text";
+import { useImageCapture } from "@/hooks/useImageCapture";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { useChannel } from "@hooks/channel/useChannel";
-import { CaptureMessageType, CapturePayload } from "@hooks/channel/message";
-import { defaultChannelId } from "@hooks/channel/channel";
+import { useChannel } from "@/hooks/channel/useChannel";
+import { CaptureMessageType, CapturePayload } from "@/hooks/channel/message";
+import { defaultChannelId } from "@/hooks/channel/channel";
 
 export default function VideoSetting() {
   const [imageCapture, ref] = useImageCapture();

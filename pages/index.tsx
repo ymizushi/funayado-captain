@@ -1,19 +1,19 @@
 import { useEffect, useState } from "react";
-import { publicConfig } from "@config";
-import { VStack } from "@components/layout/VStack";
-import { Text } from "@components/text/Text";
-import { RoomStatus, useRoomStatus } from "@hooks/useRoomStatus";
-import { speak } from "@util/textToSpeech";
-import { Header } from "@components/pages/Header";
-import { Hr } from "@components/decoration/Hr";
+import { publicConfig } from "@/config";
+import { VStack } from "@/components/layout/VStack";
+import { Text } from "@/components/text/Text";
+import { RoomStatus, useRoomStatus } from "@/hooks/useRoomStatus";
+import { speak } from "@/util/textToSpeech";
+import { Header } from "@/components/pages/Header";
+import { Hr } from "@/components/decoration/Hr";
 import MemberSetting from "./setting/MemberSetting";
 import ConditionSetting from "./setting/ConditionSetting";
 import SystemSetting from "./setting/SystemSetting";
 import VideoSetting from "./setting/VideoSetting";
-import { useSpeech } from "@hooks/useSpeech";
-import { useChannel } from "@hooks/channel/useChannel";
-import { RoomStatusMessageType } from "@hooks/channel/message";
-import { defaultChannelId } from "@hooks/channel/channel";
+import { useSpeech } from "@/hooks/useSpeech";
+import { useChannel } from "@/hooks/channel/useChannel";
+import { RoomStatusMessageType } from "@/hooks/channel/message";
+import { defaultChannelId } from "@/hooks/channel/channel";
 
 const config = publicConfig;
 
