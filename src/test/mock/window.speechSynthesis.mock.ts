@@ -1,4 +1,4 @@
-export {}
+export {};
 
 Object.defineProperty(global, "SpeechSynthesisVoice", {
   writable: true,
@@ -13,7 +13,6 @@ Object.defineProperty(global, "SpeechSynthesisVoice", {
     dispatchEvent: jest.fn(),
   })),
 });
-
 
 Object.defineProperty(global, "SpeechSynthesisUtterance", {
   writable: true,
@@ -31,13 +30,12 @@ Object.defineProperty(global, "SpeechSynthesisUtterance", {
 
 Object.defineProperty(global, "speechSynthesis", {
   writable: true,
-  value: {}
-})
+  value: {},
+});
 
 Object.defineProperty(global.speechSynthesis, "speak", {
   writable: true,
-  value: jest.fn().mockImplementation(utter => {
-    return
+  value: jest.fn().mockImplementation((utter) => {
+    return;
   }),
 });
-

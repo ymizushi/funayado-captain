@@ -1,13 +1,16 @@
-export function speak(text: string, voice: SpeechSynthesisVoice | null): boolean {
+export function speak(
+  text: string,
+  voice: SpeechSynthesisVoice | null
+): boolean {
   try {
     const utter = new SpeechSynthesisUtterance(text);
     if (voice) {
       utter.voice = voice;
     }
-    speechSynthesis.speak(utter)
-    return true
+    speechSynthesis.speak(utter);
+    return true;
   } catch (e) {
-    return false
+    return false;
   }
 }
 

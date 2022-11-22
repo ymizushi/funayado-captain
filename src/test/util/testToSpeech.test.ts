@@ -14,16 +14,16 @@ describe("getNowDateWithString", () => {
 
 describe("speak", () => {
   it("succeeded to speak", () => {
-    expect(speak("text to speech", new SpeechSynthesisVoice())).toBeTruthy()
+    expect(speak("text to speech", new SpeechSynthesisVoice())).toBeTruthy();
   });
   it("failed to speak", () => {
     Object.defineProperty(global.speechSynthesis, "speak", {
       writable: true,
-      value: jest.fn().mockImplementation(utter => {
-        throw new Error()
+      value: jest.fn().mockImplementation((utter) => {
+        throw new Error();
       }),
     });
 
-    expect(speak("text to speech", new SpeechSynthesisVoice())).toBeFalsy()
+    expect(speak("text to speech", new SpeechSynthesisVoice())).toBeFalsy();
   });
 });

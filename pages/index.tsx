@@ -44,7 +44,7 @@ const Home = () => {
       if (lastRoomStatus.bottomMaterial) {
         sentence = sentence + `ていしつは、${lastRoomStatus.bottomMaterial}。`;
       }
-      speak(sentence, voice, window);
+      speak(sentence, voice);
     }
     // voiceが変わったとしても再実行させたくないので、dependency list には含めない
     // eslint-disable-next-line react-hooks/exhaustive-deps
