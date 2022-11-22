@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build && npm run testt ",
+    "build": "next build && npm run test",
     "start": "next start",
     "lint": "next lint",
     "format": "prettier --write .",
