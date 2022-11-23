@@ -26,8 +26,10 @@ export function ScreenShot({
   id: string;
   imageCapture: ImageCapture | null;
 }) {
-  const [captureEvent, _, notifyCaptureEvent] =
-    useChannel<CapturePayload>(defaultChannelId, CaptureMessageType);
+  const [captureEvent, _, notifyCaptureEvent] = useChannel<CapturePayload>(
+    defaultChannelId,
+    CaptureMessageType
+  );
   const ref = useRef<HTMLCanvasElement | null>(null);
   const canvas = ref.current;
   const [blob, setBlob] = useState<Blob | null>(null);
