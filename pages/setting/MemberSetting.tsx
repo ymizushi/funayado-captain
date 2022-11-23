@@ -87,7 +87,7 @@ export default function MemberSetting({
 function CaptainComponent({
   setIsParent,
 }: {
-  setIsParent: (isParent: boolean) => void;
+  setIsParent: (_isParent: boolean) => void;
 }) {
   return (
     <TwoColumnComponent>

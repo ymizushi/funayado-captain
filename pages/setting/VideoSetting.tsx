@@ -26,7 +26,7 @@ export function ScreenShot({
   id: string;
   imageCapture: ImageCapture | null;
 }) {
-  const [captureEvent, capturedEventLog, notifyCaptureEvent] =
+  const [captureEvent, _, notifyCaptureEvent] =
     useChannel<CapturePayload>(defaultChannelId, CaptureMessageType);
   const ref = useRef<HTMLCanvasElement | null>(null);
   const canvas = ref.current;

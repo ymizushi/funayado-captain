@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { publicConfig } from "@/config";
 import { VStack } from "@/components/layout/VStack";
 import { Text } from "@/components/text/Text";
 import { RoomStatus, useRoomStatus } from "@/hooks/useRoomStatus";
@@ -14,8 +13,6 @@ import { useSpeech } from "@/hooks/useSpeech";
 import { useChannel } from "@/hooks/channel/useChannel";
 import { RoomStatusMessageType } from "@/hooks/channel/message";
 import { defaultChannelId } from "@/hooks/channel/channel";
-
-const config = publicConfig;
 
 export type PushStatus = "success" | "failed" | null;
 

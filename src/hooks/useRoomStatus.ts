@@ -14,7 +14,7 @@ export function useRoomStatus(
   roomId: string
 ): [
   roomStatus: RoomStatus | null,
-  setRoom: (value: RoomStatus | null) => void
+  setRoom: (_value: RoomStatus | null) => void
 ] {
   return useLocalStorage<RoomStatus | null>(
     `${STORAGE_KEY_ROOM_STATUS}?roomId=${roomId}`,

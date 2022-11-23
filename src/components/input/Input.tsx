@@ -1,4 +1,4 @@
-import React, { ChangeEventHandler } from "react";
+import React from "react";
 
 import styles from "styles/components/input/Input.module.css";
 
@@ -6,7 +6,7 @@ type InputType = "text";
 
 type Props = {
   value: string | number;
-  onChange: <T extends string>(value: T) => void;
+  onChange: <T extends string>(_value: T) => void;
   id: string;
   placeholder?: string;
   type?: InputType;

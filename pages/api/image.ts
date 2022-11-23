@@ -54,7 +54,6 @@ export default async function handler(
             text += `<${upload.file.permalink}| >`;
           }
         }
-        const result = { fields, files, text };
         resolve({ fields, files, text });
       });
     }

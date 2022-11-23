@@ -35,7 +35,7 @@ Object.defineProperty(global, "speechSynthesis", {
 
 Object.defineProperty(global.speechSynthesis, "speak", {
   writable: true,
-  value: jest.fn().mockImplementation((utter) => {
+  value: jest.fn().mockImplementation((_utter) => {
     return;
   }),
 });

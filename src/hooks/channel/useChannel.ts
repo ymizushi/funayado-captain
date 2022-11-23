@@ -11,8 +11,8 @@ const channels = new Pusher(publicConfig.pusher.key, {
 export function useChannel<A>(
   channelId: string,
   messageType: MessageType,
-  receiveHandler: ((data: A) => void) | undefined = undefined
-): [A | null, string, (payload: A) => Promise<Response>] {
+  receiveHandler: ((_data: A) => void) | undefined = undefined
+): [A | null, string, (_payload: A) => Promise<Response>] {
   const [eventLog, setEventLog] = useState<string>("");
   const [latest, setLatest] = useState<A | null>(null);
 

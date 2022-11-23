@@ -19,7 +19,7 @@ describe("speak", () => {
   it("failed to speak", () => {
     Object.defineProperty(global.speechSynthesis, "speak", {
       writable: true,
-      value: jest.fn().mockImplementation((utter) => {
+      value: jest.fn().mockImplementation((_utter) => {
         throw new Error();
       }),
     });

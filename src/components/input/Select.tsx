@@ -12,7 +12,7 @@ type SelectType<T> = {
   name: string;
   id: string;
   values: KV<T>[];
-  onChange: (value: KV<T>) => void;
+  onChange: (_value: KV<T>) => void;
   disabled?: boolean;
 };
 

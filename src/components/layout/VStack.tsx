@@ -1,4 +1,4 @@
-import React, { PropsWithChildren, Ref } from "react";
+import React, { PropsWithChildren } from "react";
 
 import classNames from "classnames";
 import styles from "styles/components/layout/VStack.module.css";

@@ -8,11 +8,11 @@ import { VStackChildren } from "@/components/layout/VStack";
 import { Component } from "@/components/basic/Component";
 import { Text } from "@/components/text/Text";
 import { VerticalRangeSlider } from "@/components/input/Slider";
-import { RoomStatus } from "@/hooks/useRoomStatus";
+import { RoomStatus } from "@hooks/useRoomStatus";
 
 type ConditionSettingProps = {
   roomStatus: RoomStatus | null;
-  setRoomStatus: (value: RoomStatus | null) => void;
+  setRoomStatus: (_value: RoomStatus | null) => void;
   isParent: boolean;
 };
 

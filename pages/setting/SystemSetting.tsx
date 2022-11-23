@@ -17,9 +17,9 @@ export type LogSettingProps = {
   setPushStatus: Dispatch<SetStateAction<PushStatus>>;
   isParent: boolean;
   roomStatus: RoomStatus | null;
-  setRoomStatus: (status: RoomStatus | null) => void;
+  setRoomStatus: (_status: RoomStatus | null) => void;
   eventLog: string;
-  roomStatusNotifier: (data: RoomStatus) => Promise<Response>;
+  roomStatusNotifier: (_data: RoomStatus) => Promise<Response>;
 };
 
 export default function SystemSetting({
