@@ -1,16 +1,20 @@
-export const speak: (
+export function speak(
   text: string,
   voice: SpeechSynthesisVoice | null
-) => void = (text, voice) => {
-  const utter = new SpeechSynthesisUtterance(text);
-  if (voice) {
-    utter.voice = voice;
+): boolean {
+  try {
+    const utter = new SpeechSynthesisUtterance(text);
+    if (voice) {
+      utter.voice = voice;
+    }
+    speechSynthesis.speak(utter);
+    return true;
+  } catch (e) {
+    return false;
   }
-  window.speechSynthesis.speak(utter);
-};
+}
 
-export function getNowDateWithString() {
-  const dt = new Date();
+export function getNowDateWithString(dt: Date = new Date()) {
   const y = dt.getFullYear();
   const m = ("00" + (dt.getMonth() + 1)).slice(-2);
   const d = ("00" + dt.getDate()).slice(-2);

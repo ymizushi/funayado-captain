@@ -1,16 +1,16 @@
-import { Button } from "@components/input/Button";
-import { Input } from "@components/input/Input";
-import { Select, KV } from "@components/input/Select";
+import { Button } from "@/components/input/Button";
+import { Input } from "@/components/input/Input";
+import { Select, KV } from "@/components/input/Select";
 import {
   TwoColumnComponent,
   FirstColumn,
   SecondColumn,
-} from "@components/layout/TwoColumnComponent";
-import { VStackChildren } from "@components/layout/VStack";
-import { speak } from "@util/textToSpeech";
+} from "@/components/layout/TwoColumnComponent";
+import { VStackChildren } from "@/components/layout/VStack";
+import { speak } from "@/util/textToSpeech";
 import { Dispatch, SetStateAction } from "react";
-import { Component } from "@components/basic/Component";
-import { Text } from "@components/text/Text";
+import { Component } from "@/components/basic/Component";
+import { Text } from "@/components/text/Text";
 
 type MemberSettingProps = {
   setIsParent: Dispatch<SetStateAction<boolean>>;
@@ -87,7 +87,7 @@ export default function MemberSetting({
 function CaptainComponent({
   setIsParent,
 }: {
-  setIsParent: (isParent: boolean) => void;
+  setIsParent: (_isParent: boolean) => void;
 }) {
   return (
     <TwoColumnComponent>

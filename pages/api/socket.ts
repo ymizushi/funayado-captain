@@ -1,8 +1,8 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 
 import Channels from "pusher";
-import { privateConfig, publicConfig } from "@config";
-import { isCaptureMessage, isRoomStatusMessage } from "@hooks/channel/message";
+import { privateConfig, publicConfig } from "@/config";
+import { isCaptureMessage, isRoomStatusMessage } from "@/hooks/channel/message";
 
 const channels = new Channels({
   appId: privateConfig.pusher.appId,

@@ -1,11 +1,11 @@
-import { Button } from "@components/input/Button";
-import { VStackChildren } from "@components/layout/VStack";
-import { Text } from "@components/text/Text";
-import { useImageCapture } from "@hooks/useImageCapture";
+import { Button } from "@/components/input/Button";
+import { VStackChildren } from "@/components/layout/VStack";
+import { Text } from "@/components/text/Text";
+import { useImageCapture } from "@/hooks/useImageCapture";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { useChannel } from "@hooks/channel/useChannel";
-import { CaptureMessageType, CapturePayload } from "@hooks/channel/message";
-import { defaultChannelId } from "@hooks/channel/channel";
+import { useChannel } from "@/hooks/channel/useChannel";
+import { CaptureMessageType, CapturePayload } from "@/hooks/channel/message";
+import { defaultChannelId } from "@/hooks/channel/channel";
 
 export default function VideoSetting() {
   const [imageCapture, ref] = useImageCapture();
@@ -26,8 +26,10 @@ export function ScreenShot({
   id: string;
   imageCapture: ImageCapture | null;
 }) {
-  const [captureEvent, capturedEventLog, notifyCaptureEvent] =
-    useChannel<CapturePayload>(defaultChannelId, CaptureMessageType);
+  const [captureEvent, _, notifyCaptureEvent] = useChannel<CapturePayload>(
+    defaultChannelId,
+    CaptureMessageType
+  );
   const ref = useRef<HTMLCanvasElement | null>(null);
   const canvas = ref.current;
   const [blob, setBlob] = useState<Blob | null>(null);
@@ -46,12 +48,23 @@ export function ScreenShot({
     }
   }, [imageCapture, canvas]);
   const upload = async (blob: Blob): Promise<void> => {
-    const formData = new FormData();
-    formData.append("file", blob);
-    await fetch("/api/image", {
-      method: "POST",
-      body: formData,
-    });
+    const reader = new FileReader();
+    reader.readAsDataURL(blob);
+    reader.onloadend = async function () {
+      var base64data = reader.result;
+      navigator.geolocation.getCurrentPosition(async (position) => {
+        if (Object.keys(position.coords).length == 0) {
+          return alert("座標を取得できません");
+        }
+        await fetch("/api/image", {
+          method: "POST",
+          body: JSON.stringify({
+            image: base64data,
+            coords: position.coords,
+          }),
+        });
+      });
+    };
   };
 
   useEffect(() => {

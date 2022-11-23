@@ -1,5 +1,5 @@
 import { WebClient } from "@slack/web-api";
-import { privateConfig } from "@config";
+import { privateConfig } from "@/config";
 import { createReadStream } from "fs";
 import type { NextApiRequest, NextApiResponse } from "next";
 import {
@@ -54,7 +54,6 @@ export default async function handler(
             text += `<${upload.file.permalink}| >`;
           }
         }
-        const result = { fields, files, text };
         resolve({ fields, files, text });
       });
     }

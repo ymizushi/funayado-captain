@@ -1,6 +1,5 @@
 import { Dispatch, useCallback, useEffect, useState } from "react";
 
-const STORAGE_KEY_STATUS = "work.ymizushi.funayado-captain/roomStatus";
 import { SetStateAction } from "react";
 
 export function useLocalStorage<T>(

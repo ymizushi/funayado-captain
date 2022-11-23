@@ -1,4 +1,4 @@
-import React, { ChangeEventHandler } from "react";
+import React from "react";
 
 import Slider from "rc-slider";
 import "rc-slider/assets/index.css";
@@ -7,7 +7,7 @@ export type Props = {
   value: number;
   min: number;
   max: number;
-  onChange: (n: number) => void;
+  onChange: (_n: number) => void;
   disabled?: boolean;
 };
 
