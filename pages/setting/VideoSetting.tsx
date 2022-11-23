@@ -48,12 +48,23 @@ export function ScreenShot({
     }
   }, [imageCapture, canvas]);
   const upload = async (blob: Blob): Promise<void> => {
-    const formData = new FormData();
-    formData.append("file", blob);
-    await fetch("/api/image", {
-      method: "POST",
-      body: formData,
-    });
+    const reader = new FileReader();
+    reader.readAsDataURL(blob);
+    reader.onloadend = async function () {
+      var base64data = reader.result;
+      navigator.geolocation.getCurrentPosition(async (position) => {
+        if (Object.keys(position.coords).length == 0) {
+          return alert("座標を取得できません");
+        }
+        await fetch("/api/image", {
+          method: "POST",
+          body: JSON.stringify({
+            image: base64data,
+            coords: position.coords,
+          }),
+        });
+      });
+    };
   };
 
   useEffect(() => {
