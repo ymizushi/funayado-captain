@@ -4,9 +4,9 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "npm run format:check && next build && npm run test",
+    "build": "next build && npm run test",
     "start": "next start",
-    "lint": "next lint",
+    "lint": "npm run format:check && next lint",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "test": "jest",
