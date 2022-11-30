@@ -19,6 +19,13 @@ export default function VideoSetting() {
   );
 }
 
+export type Coords = {
+  latitude: number,
+  longitude: number
+  accuracy: number
+  timestamp: EpochTimeStamp
+}
+
 export function ScreenShot({
   id,
   imageCapture,
@@ -33,6 +40,10 @@ export function ScreenShot({
   const ref = useRef<HTMLCanvasElement | null>(null);
   const canvas = ref.current;
   const [blob, setBlob] = useState<Blob | null>(null);
+
+  function error(err: any) {
+    console.warn(`ERROR(${err.code}): ${err.message}`);
+  }
 
   const capture = useCallback(async (): Promise<void> => {
     const imageBitmap = await imageCapture?.grabFrame();
@@ -53,17 +64,20 @@ export function ScreenShot({
     reader.onloadend = async function () {
       var base64data = reader.result;
       navigator.geolocation.getCurrentPosition(async (position) => {
-        if (Object.keys(position.coords).length == 0) {
-          return alert("座標を取得できません");
+        const coords: Coords = {
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude,
+          accuracy: position.coords.accuracy,
+          timestamp: position.timestamp
         }
         await fetch("/api/image", {
           method: "POST",
           body: JSON.stringify({
             image: base64data,
-            coords: position.coords,
+            coords: coords,
           }),
         });
-      });
+      }, error);
     };
   };
 

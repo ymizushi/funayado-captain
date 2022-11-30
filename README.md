@@ -33,3 +33,15 @@ npm run lint
 npm run format
 npm run test
 ```
+
+## environment variable
+
+
+```ps1
+$Env:PUSHER_APP_ID = "xxxxxxx"
+$Env:NEXT_PUBLIC_PUSHER_KEY = "xxxxxxxxxxxxxxxxxxxx"
+$Env:PUSHER_SECRET = "xxxxxxxxxxxxxxxxxxxx"
+$Env:NEXT_PUBLIC_PUSHER_CLUSTER = "xxx"
+$Env:SLACK_TOKEN = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+$Env:SLACK_CHANNEL_ID = "xxxxxxxxxxx"
+```
