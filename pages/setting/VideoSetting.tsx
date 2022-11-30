@@ -19,6 +19,13 @@ export default function VideoSetting() {
   );
 }
 
+export type Coords = {
+  latitude: number;
+  longitude: number;
+  accuracy: number;
+  timestamp: EpochTimeStamp;
+};
+
 export function ScreenShot({
   id,
   imageCapture,
