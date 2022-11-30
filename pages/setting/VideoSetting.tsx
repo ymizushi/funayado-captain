@@ -64,20 +64,17 @@ export function ScreenShot({
     reader.onloadend = async function () {
       var base64data = reader.result;
       navigator.geolocation.getCurrentPosition(async (position) => {
-        const coords: Coords = {
-          latitude: position.coords.latitude,
-          longitude: position.coords.longitude,
-          accuracy: position.coords.accuracy,
-          timestamp: position.timestamp
+        if (Object.keys(position.coords).length == 0) {
+          return alert("座標を取得できません");
         }
         await fetch("/api/image", {
           method: "POST",
           body: JSON.stringify({
             image: base64data,
-            coords: coords,
+            coords: position.coords,
           }),
         });
-      }, error);
+      });
     };
   };
 
