@@ -20,11 +20,11 @@ export default function VideoSetting() {
 }
 
 export type Coords = {
-  latitude: number,
-  longitude: number
-  accuracy: number
-  timestamp: EpochTimeStamp
-}
+  latitude: number;
+  longitude: number;
+  accuracy: number;
+  timestamp: EpochTimeStamp;
+};
 
 export function ScreenShot({
   id,
@@ -40,10 +40,6 @@ export function ScreenShot({
   const ref = useRef<HTMLCanvasElement | null>(null);
   const canvas = ref.current;
   const [blob, setBlob] = useState<Blob | null>(null);
-
-  function error(err: any) {
-    console.warn(`ERROR(${err.code}): ${err.message}`);
-  }
 
   const capture = useCallback(async (): Promise<void> => {
     const imageBitmap = await imageCapture?.grabFrame();

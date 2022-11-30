@@ -36,7 +36,6 @@ npm run test
 
 ## environment variable
 
-
 ```ps1
 $Env:PUSHER_APP_ID = "xxxxxxx"
 $Env:NEXT_PUBLIC_PUSHER_KEY = "xxxxxxxxxxxxxxxxxxxx"
