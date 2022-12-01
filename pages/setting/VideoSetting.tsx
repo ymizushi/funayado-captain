@@ -1,20 +1,111 @@
-import { Button } from "@/components/input/Button";
+import { LargeButton } from "@/components/input/Button";
 import { VStackChildren } from "@/components/layout/VStack";
 import { Text } from "@/components/text/Text";
-import { useImageCapture } from "@/hooks/useImageCapture";
-import { useCallback, useEffect, useRef, useState } from "react";
-import { useChannel } from "@/hooks/channel/useChannel";
-import { CaptureMessageType, CapturePayload } from "@/hooks/channel/message";
-import { defaultChannelId } from "@/hooks/channel/channel";
+import { useMediaStream } from "@/hooks/useImageCapture";
+import { MutableRefObject, useEffect, useState } from "react";
+import {
+  FirstColumn,
+  SecondColumn,
+  TwoColumnComponent,
+} from "@/components/layout/TwoColumnComponent";
+import { Component } from "@/components/basic/Component";
+import { KV, Select } from "@/components/input/Select";
+import { useCapture } from "@/hooks/useCapture";
+import { useUpload } from "@/hooks/useUpload";
 
-export default function VideoSetting() {
-  const [imageCapture, ref] = useImageCapture();
+export default function VideoSetting({ isParent }: { isParent: boolean }) {
+  const [mediaStream, ref] = useMediaStream();
+  const [imageCapture, setImageCapture] = useState<ImageCapture | null>(null);
+  useEffect(() => {
+    if (mediaStream) {
+      const track = mediaStream.getTracks()[0];
+      setImageCapture(new ImageCapture(track));
+    }
+  }, [setImageCapture, mediaStream]);
+
+  const [blob, htmlCanvasElementRef, notifyCaptureEvent] = useCapture({
+    imageCapture,
+  });
+
   return (
     <>
       <VStackChildren>
-        <video ref={ref} autoPlay></video>
-        <ScreenShot id="screenshot" imageCapture={imageCapture} />
+        <TwoColumnComponent>
+          <FirstColumn>
+            <Component></Component>
+          </FirstColumn>
+          <SecondColumn>
+            <Component>
+              <LargeButton
+                onClick={async () => {
+                  const res = await notifyCaptureEvent({});
+                  if (!res.ok) {
+                    console.error("failed to push data.");
+                  }
+                }}
+              >
+                <Text>キャプチャー&アップロード依頼</Text>
+              </LargeButton>
+            </Component>
+          </SecondColumn>
+        </TwoColumnComponent>
       </VStackChildren>
+      {isParent ? (
+        <>
+          <VStackChildren>
+            <TwoColumnComponent>
+              <FirstColumn>
+                <Text>せんたく</Text>
+              </FirstColumn>
+              <SecondColumn>
+                <Component>
+                  <Select
+                    name={"selectCamera"}
+                    id={"selectCamera"}
+                    values={
+                      mediaStream?.getVideoTracks().map((track) => ({
+                        key: track.id,
+                        name: track.label,
+                        value: track.id,
+                      })) ?? []
+                    }
+                    onChange={(kv: KV<string>) => {
+                      const head =
+                        mediaStream
+                          ?.getVideoTracks()
+                          .filter((track) => kv.key == track.id)[0] ?? null;
+                      return setImageCapture(
+                        head ? new ImageCapture(head) : null
+                      );
+                    }}
+                  />
+                </Component>
+              </SecondColumn>
+            </TwoColumnComponent>
+          </VStackChildren>
+          <VStackChildren>
+            <TwoColumnComponent>
+              <FirstColumn>
+                <Component>
+                  <Text>カメラにゅうりょく</Text>
+                </Component>
+              </FirstColumn>
+              <SecondColumn>
+                <video ref={ref} autoPlay></video>
+              </SecondColumn>
+            </TwoColumnComponent>
+          </VStackChildren>
+          <VStackChildren>
+            <ScreenShot
+              id="screenshot"
+              htmlCanvasElementRef={htmlCanvasElementRef}
+              blob={blob}
+            />
+          </VStackChildren>
+        </>
+      ) : (
+        <></>
+      )}
     </>
   );
 }
@@ -28,83 +119,25 @@ export type Coords = {
 
 export function ScreenShot({
   id,
-  imageCapture,
+  htmlCanvasElementRef,
+  blob,
 }: {
   id: string;
-  imageCapture: ImageCapture | null;
+  htmlCanvasElementRef: MutableRefObject<HTMLCanvasElement | null>;
+  blob: Blob | null;
 }) {
-  const [captureEvent, _, notifyCaptureEvent] = useChannel<CapturePayload>(
-    defaultChannelId,
-    CaptureMessageType
-  );
-  const ref = useRef<HTMLCanvasElement | null>(null);
-  const canvas = ref.current;
-  const [blob, setBlob] = useState<Blob | null>(null);
-
-  const capture = useCallback(async (): Promise<void> => {
-    const imageBitmap = await imageCapture?.grabFrame();
-    if (canvas && imageBitmap) {
-      canvas.width = imageBitmap.width;
-      canvas.height = imageBitmap.height;
-      canvas.getContext("2d")?.drawImage(imageBitmap, 0, 0);
-      canvas.toBlob((b) => {
-        if (b) {
-          setBlob(b);
-        }
-      });
-    }
-  }, [imageCapture, canvas]);
-  const upload = async (blob: Blob): Promise<void> => {
-    const reader = new FileReader();
-    reader.readAsDataURL(blob);
-    reader.onloadend = async function () {
-      var base64data = reader.result;
-      navigator.geolocation.getCurrentPosition(async (position) => {
-        // if (Object.keys(position.coords).length == 0) {
-        //   alert("座標を取得できません");
-        // }
-        await fetch("/api/image", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            image: base64data,
-            coords: {
-              latitude: position.coords.latitude,
-              longitude: position.coords.longitude,
-            },
-          }),
-        });
-      });
-    };
-  };
-
-  useEffect(() => {
-    if (captureEvent) {
-      capture();
-    }
-  }, [captureEvent, capture]);
-
-  useEffect(() => {
-    if (blob) {
-      upload(blob);
-    }
-  }, [blob]);
+  useUpload({ blob });
 
   return (
-    <>
-      <canvas id={id} ref={ref} />
-      <Button
-        onClick={async () => {
-          const res = await notifyCaptureEvent({});
-          if (!res.ok) {
-            console.error("failed to push data.");
-          }
-        }}
-      >
-        <Text>キャプチャー&アップロード依頼</Text>
-      </Button>
-    </>
+    <TwoColumnComponent>
+      <FirstColumn>
+        <Component>
+          <Text>さつえいけっか</Text>
+        </Component>
+      </FirstColumn>
+      <SecondColumn>
+        <canvas id={id} ref={htmlCanvasElementRef} />
+      </SecondColumn>
+    </TwoColumnComponent>
   );
 }

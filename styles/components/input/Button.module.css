@@ -11,6 +11,11 @@
   background-color: white;
 }
 
+.buttonLarge {
+  font-size: 24px;
+  height: 200px;
+}
+
 .button:disabled {
   background-color: gray;
 }
