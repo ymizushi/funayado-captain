@@ -60,14 +60,20 @@ export function ScreenShot({
     reader.onloadend = async function () {
       var base64data = reader.result;
       navigator.geolocation.getCurrentPosition(async (position) => {
-        if (Object.keys(position.coords).length == 0) {
-          return alert("座標を取得できません");
-        }
+        // if (Object.keys(position.coords).length == 0) {
+        //   alert("座標を取得できません");
+        // }
         await fetch("/api/image", {
           method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
           body: JSON.stringify({
             image: base64data,
-            coords: position.coords,
+            coords: {
+              latitude: position.coords.latitude,
+              longitude: position.coords.longitude,
+            },
           }),
         });
       });
