@@ -29,22 +29,26 @@ export function useCapture({
   const canvas = ref.current;
   const [blob, setBlob] = useState<Blob | null>(null);
 
-  const capture = useCallback(async (): Promise<void> => {
-    const imageBitmap = await imageCapture?.grabFrame();
+  const capture = useCallback((): void => {
+    console.log(imageCapture)
+    const imageBitmap = imageCapture?.grabFrame();
     if (canvas && imageBitmap) {
-      canvas.width = imageBitmap.width;
-      canvas.height = imageBitmap.height;
-      canvas.getContext("2d")?.drawImage(imageBitmap, 0, 0);
-      canvas.toBlob((b) => {
-        if (b) {
-          setBlob(b);
-        }
-      });
+      imageBitmap.then(bitmap => {
+        canvas.width = bitmap.width;
+        canvas.height = bitmap.height;
+        canvas.getContext("2d")?.drawImage(bitmap, 0, 0);
+        canvas.toBlob((b) => {
+          if (b) {
+            setBlob(b);
+          }
+        });
+      }
+      )
     }
   }, [imageCapture, canvas]);
 
   useEffect(() => {
-    if (!isParent && captureEvent) {
+    if (captureEvent) {
       capture();
     }
   }, [captureEvent, capture]);
