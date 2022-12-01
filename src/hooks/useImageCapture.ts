@@ -1,11 +1,11 @@
 import { MutableRefObject, useEffect, useRef, useState } from "react";
 
-export function useImageCapture(): [
-  ImageCapture | null,
+export function useMediaStream(): [
+  MediaStream | null,
   MutableRefObject<HTMLVideoElement | null>
 ] {
   const ref = useRef<HTMLVideoElement | null>(null);
-  const [imageCapture, setImageCapture] = useState<ImageCapture | null>(null);
+  const [mediaStream, setMediaStream] = useState<MediaStream | null>(null);
 
   useEffect(() => {
     navigator.mediaDevices
@@ -14,14 +14,11 @@ export function useImageCapture(): [
         const video = ref.current;
         if (video) {
           video.srcObject = mediaStream;
-          console.log(mediaStream);
         }
-
-        const track = mediaStream.getVideoTracks()[0];
-        setImageCapture(new ImageCapture(track));
+        setMediaStream(mediaStream);
       })
-      .catch((error) => console.log(`imageCapture failed: ${error}`));
-  }, [setImageCapture]);
+      .catch((error) => console.log(`getVideoTracks failed: ${error}`));
+  }, [setMediaStream]);
 
-  return [imageCapture, ref];
+  return [mediaStream, ref];
 }
