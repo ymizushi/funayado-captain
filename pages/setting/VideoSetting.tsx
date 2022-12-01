@@ -24,6 +24,7 @@ export default function VideoSetting({ isParent }: { isParent: boolean }) {
   }, [setImageCapture, mediaStream]);
 
   const [blob, htmlCanvasElementRef, notifyCaptureEvent] = useCapture({
+    isParent,
     imageCapture,
   });
 

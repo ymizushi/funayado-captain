@@ -10,8 +10,10 @@ import { CaptureMessageType, CapturePayload } from "./channel/message";
 import { useChannel } from "./channel/useChannel";
 
 export function useCapture({
+  isParent,
   imageCapture,
 }: {
+  isParent: boolean,
   imageCapture: ImageCapture | null;
 }): [
   Blob | null,
@@ -42,7 +44,7 @@ export function useCapture({
   }, [imageCapture, canvas]);
 
   useEffect(() => {
-    if (captureEvent) {
+    if (!isParent && captureEvent) {
       capture();
     }
   }, [captureEvent, capture]);
