@@ -10,10 +10,8 @@ import { CaptureMessageType, CapturePayload } from "./channel/message";
 import { useChannel } from "./channel/useChannel";
 
 export function useCapture({
-  isParent,
   imageCapture,
 }: {
-  isParent: boolean,
   imageCapture: ImageCapture | null;
 }): [
   Blob | null,
@@ -30,10 +28,10 @@ export function useCapture({
   const [blob, setBlob] = useState<Blob | null>(null);
 
   const capture = useCallback((): void => {
-    console.log(imageCapture)
+    console.log(imageCapture);
     const imageBitmap = imageCapture?.grabFrame();
     if (canvas && imageBitmap) {
-      imageBitmap.then(bitmap => {
+      imageBitmap.then((bitmap) => {
         canvas.width = bitmap.width;
         canvas.height = bitmap.height;
         canvas.getContext("2d")?.drawImage(bitmap, 0, 0);
@@ -42,8 +40,7 @@ export function useCapture({
             setBlob(b);
           }
         });
-      }
-      )
+      });
     }
   }, [imageCapture, canvas]);
 
