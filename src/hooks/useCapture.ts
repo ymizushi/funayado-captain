@@ -5,7 +5,6 @@ export function useCapture({
 }: {
   imageCapture: ImageCapture | null;
 }): [Blob | null, MutableRefObject<HTMLCanvasElement | null>, () => void] {
-
   const ref = useRef<HTMLCanvasElement | null>(null);
   const canvas = ref.current;
   const [blob, setBlob] = useState<Blob | null>(null);
@@ -25,6 +24,6 @@ export function useCapture({
       });
     }
   }, [imageCapture, canvas]);
-  
+
   return [blob, ref, capture];
 }
