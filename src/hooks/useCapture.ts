@@ -13,8 +13,8 @@ export function useCapture({
     const imageBitmap = imageCapture?.grabFrame();
     if (canvas && imageBitmap) {
       imageBitmap.then((bitmap) => {
-        canvas.width = bitmap.width;
-        canvas.height = bitmap.height;
+        canvas.width = bitmap.width/2;
+        canvas.height = bitmap.height/2;
         canvas.getContext("2d")?.drawImage(bitmap, 0, 0);
         canvas.toBlob((b) => {
           if (b) {
