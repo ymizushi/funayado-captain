@@ -78,7 +78,7 @@ const Home = () => {
           roomStatusNotifier={roomStatusNotifier}
         />
         <Hr />
-        <VideoSetting isParent={true} />
+        <VideoSetting isParent={isParent} />
       </VStack>
     </>
   );

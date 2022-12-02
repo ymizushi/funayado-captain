@@ -9,7 +9,11 @@ export function useMediaStream(): [
 
   useEffect(() => {
     navigator.mediaDevices
-      .getUserMedia({ video: true })
+      .getUserMedia({
+        video: {
+          facingMode: { exact: "environment" },
+        },
+      })
       .then((mediaStream) => {
         const video = ref.current;
         if (video) {
