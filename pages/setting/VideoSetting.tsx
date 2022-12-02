@@ -12,10 +12,52 @@ import { Component } from "@/components/basic/Component";
 import { KV, Select } from "@/components/input/Select";
 import { useCapture } from "@/hooks/useCapture";
 import { useUpload } from "@/hooks/useUpload";
+import { useChannel } from "@/hooks/channel/useChannel";
+import { CaptureMessageType, CapturePayload } from "@/hooks/channel/message";
+import { defaultChannelId } from "@/hooks/channel/channel";
+
+function ChildView({
+  notifyCaptureEvent,
+}: {
+  notifyCaptureEvent: (_payload: CapturePayload) => Promise<Response>;
+}) {
+  return (
+    <VStackChildren>
+      <TwoColumnComponent>
+        <FirstColumn>
+          <Component></Component>
+        </FirstColumn>
+        <SecondColumn>
+          <Component>
+            <LargeButton
+              onClick={async () => {
+                const res = await notifyCaptureEvent({});
+                if (!res.ok) {
+                  console.error("failed to push data.");
+                }
+              }}
+            >
+              <Text>キャプチャー&アップロード依頼</Text>
+            </LargeButton>
+          </Component>
+        </SecondColumn>
+      </TwoColumnComponent>
+    </VStackChildren>
+  );
+}
 
 export default function VideoSetting({ isParent }: { isParent: boolean }) {
+  const [captureEvent, _, notifyCaptureEvent] = useChannel<CapturePayload>(
+    defaultChannelId,
+    CaptureMessageType
+  );
+
   const [mediaStream, ref] = useMediaStream();
   const [imageCapture, setImageCapture] = useState<ImageCapture | null>(null);
+  const [blob, htmlCanvasElementRef, capture] = useCapture({
+    imageCapture,
+  });
+
   useEffect(() => {
     if (mediaStream) {
       const track = mediaStream.getTracks()[0];
@@ -23,33 +65,15 @@ export default function VideoSetting({ isParent }: { isParent: boolean }) {
     }
   }, [setImageCapture, mediaStream]);
 
-  const [blob, htmlCanvasElementRef, notifyCaptureEvent] = useCapture({
-    imageCapture,
-  });
+  useEffect(() => {
+    if (captureEvent) {
+      capture();
+    }
+  }, [captureEvent, capture]);
 
   return (
     <>
-      <VStackChildren>
-        <TwoColumnComponent>
-          <FirstColumn>
-            <Component></Component>
-          </FirstColumn>
-          <SecondColumn>
-            <Component>
-              <LargeButton
-                onClick={async () => {
-                  const res = await notifyCaptureEvent({});
-                  if (!res.ok) {
-                    console.error("failed to push data.");
-                  }
-                }}
-              >
-                <Text>キャプチャー&アップロード依頼</Text>
-              </LargeButton>
-            </Component>
-          </SecondColumn>
-        </TwoColumnComponent>
-      </VStackChildren>
+      <ChildView notifyCaptureEvent={notifyCaptureEvent} />
       {isParent ? (
         <>
           <VStackChildren>
@@ -103,9 +127,7 @@ export default function VideoSetting({ isParent }: { isParent: boolean }) {
             />
           </VStackChildren>
         </>
-      ) : (
-        <></>
-      )}
+      ) : null}
     </>
   );
 }
